@@ -2,6 +2,7 @@ version: "2"
 services:
   db:
     image: postgres:9.4
+    container_name: exchange_rates_postgres
     hostname: db
     environment:
       - POSTGRES_USER=postgres
@@ -9,9 +10,11 @@ services:
       - POSTGRES_DB=postgres
   redis:
     image: redis:2.8.19
+    container_name: exchange_rates_redis
     hostname: redis
   rabbit:
     hostname: rabbit
+    container_name: exchange_rates_rabbit
     image: rabbitmq:3.6-management
     environment:
       - RABBITMQ_DEFAULT_USER=exchange
@@ -21,6 +24,7 @@ services:
       - "15672"
   web:
     build: .
+    container_name: exchange_rates_web
     hostname: web
     command: ./run_web.sh
     volumes:
@@ -33,6 +37,7 @@ services:
       - redis:redis
   worker:
     build: .
+    container_name: exchange_rates_worker
     command: ./run_celery.sh
     volumes:
       - .:/app
@@ -43,7 +48,7 @@ services:
   tests:
     build: .
     container_name: exchange_rates_tests
-    command: py.test
+    command: py.test exchange_rates/tests/
     volumes:
       - .:/app
     links:
