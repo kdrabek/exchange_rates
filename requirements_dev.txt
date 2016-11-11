@@ -1,3 +1,5 @@
 pytest
 pytest-django
+ipython
+django_extensions
 mock
