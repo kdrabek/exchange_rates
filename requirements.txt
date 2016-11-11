@@ -1,0 +1,4 @@
+Django==1.9.8
+celery
+psycopg2==2.5.3
+redis==2.10.5

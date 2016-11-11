@@ -1,0 +1,51 @@
+version: "2"
+services:
+  db:
+    image: postgres:9.4
+    hostname: db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+  redis:
+    image: redis:2.8.19
+    hostname: redis
+  rabbit:
+    hostname: rabbit
+    image: rabbitmq:3.6-management
+    environment:
+      - RABBITMQ_DEFAULT_USER=exchange
+      - RABBITMQ_DEFAULT_PASS=Zasada123456789
+    ports:
+      - "5672"
+      - "15672"
+  web:
+    build: .
+    hostname: web
+    command: ./run_web.sh
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    links:
+      - db:db
+      - rabbit:rabbit
+      - redis:redis
+  worker:
+    build: .
+    command: ./run_celery.sh
+    volumes:
+      - .:/app
+    links:
+      - db:db
+      - rabbit:rabbit
+      - redis:redis
+  tests:
+    build: .
+    container_name: exchange_rates_tests
+    command: py.test
+    volumes:
+      - .:/app
+    links:
+      - db:db
+      - redis:redis
