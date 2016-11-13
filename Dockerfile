@@ -7,3 +7,5 @@ WORKDIR /app/
 RUN pip install -r requirements.txt
 RUN pip install -r requirements_dev.txt
 RUN adduser --disabled-password --gecos "" exchange
+RUN touch exchange_rates.log
+RUN chown exchange:exchange exchange_rates.log

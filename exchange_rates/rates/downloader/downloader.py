@@ -1,9 +1,13 @@
+import logging
 from decimal import Decimal
 
 from datetime import datetime, date
 import requests
 
 from rates.models import Currency, Rate, Table
+
+
+log = logging.getLogger(__name__)
 
 
 class DateBeforeThreshold(Exception):
@@ -19,12 +23,21 @@ class RatesFetcher(object):
     BASE_URL = 'http://api.nbp.pl/api/exchangerates/tables/{table}/{date}'
 
     def fetch(self, date, table):
+        log.info(
+            'Starting fetching rates info for date: {0} table: {1} '.format(
+                date, table
+            )
+        )
         url = self._prepare_url(date, table)
         try:
             response = requests.get(url)
             response.raise_for_status()
-        except Exception as e:
-            pass #TODO: more meaningful exception, log error (add logging btw)
+        except requests.exceptions.HttpError as e:
+            log.error('{0} occurred for date: {1} table: {2} '.format(
+                    e, date, table
+                )
+            )
+            raise
         else:
             return response.json()[0]
 

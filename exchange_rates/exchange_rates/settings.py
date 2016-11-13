@@ -179,3 +179,36 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 STATIC_URL = '/static/'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(asctime)s %(levelname)s %(name)s %(message)s'
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'exchange_rates.log'),
+            'formatter': 'verbose'
+        },
+        'stream': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['stream'],
+            'propagate': True,
+        },
+        'exchange_rates': {
+            'handlers': ['file', 'stream'],
+            'level': 'INFO',
+        }
+    }
+}
