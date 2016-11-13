@@ -1,5 +1,7 @@
+freezegun
+django_extensions
 pytest
 pytest-django
 ipython
-django_extensions
+ipdb
 mock

@@ -10,15 +10,14 @@ class Currency(models.Model):
 
 class Rate(models.Model):
 
-    code = models.ForeignKey('Currency')
+    currency = models.ForeignKey('Currency')
     rate = models.DecimalField(max_digits=6, decimal_places=4)
-    date = models.DateField(auto_now=False, auto_now_add=False)
-    table_id = models.ForeignKey('Table')
+    table = models.ForeignKey('Table')
 
 
 class Table(models.Model):
 
-    table_id = models.CharField(max_length=50, primary_key=True)
+    id = models.CharField(max_length=50, primary_key=True)
     type = models.CharField(max_length=1)
-    effective_date = models.DateField(auto_now=False, auto_now_add=False)
+    date = models.DateField(auto_now=False, auto_now_add=False)
     when_fetched = models.DateTimeField(auto_now=False, auto_now_add=True)
