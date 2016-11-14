@@ -48,7 +48,7 @@ services:
   tests:
     build: .
     container_name: exchange_rates_tests
-    command: py.test exchange_rates/tests/
+    command: py.test 
     volumes:
       - .:/app
     links:
