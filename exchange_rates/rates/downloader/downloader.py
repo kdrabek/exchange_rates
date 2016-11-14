@@ -4,7 +4,7 @@ from decimal import Decimal
 from datetime import datetime, date
 import requests
 
-from rates.models import Currency, Rate, Table
+from exchange_rates.rates.models import Currency, Rate, Table
 
 
 log = logging.getLogger(__name__)
@@ -74,12 +74,14 @@ class RatesSaver(object):
         )
 
     def _save_currency(self, rate, table_type):
-        currency, created = Currency.objects.get_or_create(
+        try:
+            return Currency.objects.get(code=rate['code'])
+        except Currency.DoesNotExist:
+            return Currency.objects.create(
             code=rate['code'],
-            name=rate['currency'],
+            name=rate.get('currency') or rate.get('country'),
             table_type=table_type
-        )
-        return currency
+            )
 
 
 class RatesDownloader(object):
@@ -93,7 +95,7 @@ class RatesDownloader(object):
         self._saver = RatesSaver()
 
     def _validate(self, date, table):
-        if date <= self.THRESHOLD_DATE:
+        if date < self.THRESHOLD_DATE:
             raise DateBeforeThreshold()
         if table not in self.ALLOWED_TABLES:
             raise TableNameInvalid()

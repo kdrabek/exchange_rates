@@ -5,11 +5,11 @@ import pytest
 from mock import patch, MagicMock, sentinel
 from vcr import use_cassette
 
-from rates.downloader.downloader import (
+from exchange_rates.rates.downloader.downloader import (
     RatesFetcher, RatesSaver, RatesDownloader,
     DateBeforeThreshold, TableNameInvalid
 )
-from rates.models import Table, Rate, Currency
+from exchange_rates.rates.models import Table, Rate, Currency
 
 
 HERE = os.path.dirname(os.path.realpath(__file__))
@@ -35,7 +35,7 @@ class TestRatesFetcher(object):
             ['code', 'currency', 'mid']
         )
 
-    @patch('rates.downloader.downloader.requests')
+    @patch('exchange_rates.rates.downloader.downloader.requests')
     def test_fetch_get_uses_correct_url(self, mock_requests, fetcher):
         fetcher.fetch(date=date(2016, 11, 7), table='A')
         expected_url = fetcher.BASE_URL.format(table='A', date='2016-11-07')
