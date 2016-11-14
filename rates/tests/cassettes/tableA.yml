@@ -1,0 +1,39 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.11.1]
+    method: GET
+    uri: http://api.nbp.pl/api/exchangerates/tables/A/2016-11-07
+  response:
+    body:
+      string: !!binary |
+        H4sIAB2zKVgA/3WVy27iMBSGXyVixUhtaudCQndc2tKhpSgU9aYuTGKoSbCRQwYlVTfVvMS8z/S9
+        xqEkcQyzQAKTL+f2n98v740NmkW4cd7oNE4alIkvBrTPOmej7vjMALAlTvF8jv0N+YX7aJM/mR+f
+        QngKHPEnF2dx4/zlveEnnGPqp+KJGdpozXu0jBANCPohHvNZkKP3g674sSJB4xzoEEL346QGBixC
+        XEMrzNMQff2OQ1Kx00m/YE29DU3jOJvEG44isqyxnanEAmAdZweMLkLxSaqgg2EJAt0GVuto0BBR
+        FKT1kL1OSRp62wDOUZKyLctw3qdMrnX0LMGu7RzvU0zoAq0TXit1ciWj0FZLxQlnVX0XU69oqqWb
+        hmsqWc4ZJ1QM8+HvnwVPpUkOppcFCHQALWipJEc01OJsi5Y+qqfYG5SspQNgtFU0ESHjbIN5JCqs
+        kr3qjouYlu7aECjcG0+3FGnNacgRobLupp1BQQrd2SZUyCWmWvMnWjNak+vP8VOFAdOxDoQTMs5E
+        SD/DcYiqTHvPwwqELaDG22NBkmtc4vpDibNdqIpmz5H4WzESeT2RSGDaJlAHsmcp49t6sqM7CbWc
+        1n+SFaPEQqVSzMmFDJqWKp4wyafRexMRkb+U5zHwJNI+DBnhpcaT1a49kgV4d6Oqre2WoWYa4a3W
+        7CZfnwvEa4PsXpWgoRvQVJUTEY60TcKxL9d375Xjh7phHaywWN5UIxlHOBIrKBSLQxxVIri+mRTZ
+        Qh0YjuodaxwzzX8j32aFK7B3U+pc7Baw2+r678i5ANdkZ5ISOx7IrHuggh26wmFcGKzE3j6WXQK6
+        AQ7Cio0OtKaH18ksIiHSxuzrMwkoYVsxrs5ceDaRHOK5U1qLeFsbqOVzjCIxLY6yNKoPy7up+mZA
+        oDqYcKTFgghTukURzmq6un2SYrYNV3UWnsxwpHEWK2btTaV7CbSgqmSerAnSCA0YxVnOSltw3Zdi
+        gtzODqPuaZUcyaTttg6ccMuoti67zMQKY/VaHHoPRbdysZiWoSafJohq4mpeEToj+T4SKjt5b1Sq
+        XFxxjmMr3jjpe6LVlw/SaB+rkm3dAjb4eP14/QfOTQqETAgAAA==
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Length: ['835']
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Mon, 14 Nov 2016 11:50:37 GMT']
+      ETag: ['"/5W1HuZkd1jK9f+fbSvhVzC4NNeAR+q36P0sqZAggZE="']
+      Expires: ['-1']
+      Pragma: [no-cache]
+    status: {code: 200, message: OK}
+version: 1
