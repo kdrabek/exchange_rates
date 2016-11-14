@@ -7,7 +7,7 @@ from vcr import use_cassette
 
 from rates.downloader.downloader import (
     RatesFetcher, RatesSaver, RatesDownloader,
-    DateBeforeThreshold, TableNameInvalid
+    DateBeforeThreshold, InvalidTableType
 )
 from rates.models import Table, Rate, Currency
 
@@ -15,15 +15,15 @@ from rates.models import Table, Rate, Currency
 HERE = os.path.dirname(os.path.realpath(__file__))
 
 
-class TestRatesFetcher(object):
+class TestRatesDownloader(object):
 
     @pytest.fixture
-    def fetcher(self):
-        return RatesFetcher()
+    def downloader(self):
+        return RatesDownloader()
 
     @use_cassette(os.path.join(HERE, 'cassettes/tableA.yml'))
-    def test_fetch(self, fetcher):
-        response = fetcher.fetch(date=date(2016, 11, 7), table='A')
+    def test_fetch(self, downloader):
+        response = downloader.download(date=date(2016, 11, 7), table='A')
         sample_rate = response['rates'][0]
 
         assert isinstance(response, dict)
@@ -36,9 +36,9 @@ class TestRatesFetcher(object):
         )
 
     @patch('rates.downloader.downloader.requests')
-    def test_fetch_get_uses_correct_url(self, mock_requests, fetcher):
-        fetcher.fetch(date=date(2016, 11, 7), table='A')
-        expected_url = fetcher.BASE_URL.format(table='A', date='2016-11-07')
+    def test_fetch_get_uses_correct_url(self, mock_requests, downloader):
+        downloader.download(date=date(2016, 11, 7), table='A')
+        expected_url = downloader.BASE_URL.format(table='A', date='2016-11-07')
 
         mock_requests.get.assert_called_once_with(expected_url)
 
@@ -75,35 +75,35 @@ class TestRatesSaver(object):
         assert len(Currency.objects.all()) == 1
 
 
-class TestRatesDownloader(object):
+class TestRatesFetcher(object):
 
     @pytest.fixture
     def fetcher_return_value(self):
-        return sentinel
+        return [sentinel]
 
     @pytest.fixture
-    def downloader(self, fetcher_return_value):
-        downloader = RatesDownloader()
-        downloader._fetcher = MagicMock(spec=RatesFetcher)
-        downloader._fetcher.fetch.return_value = fetcher_return_value
-        downloader._saver = MagicMock(spec=RatesSaver)
-        return downloader
+    def fetcher(self, fetcher_return_value):
+        fetcher = RatesFetcher()
+        fetcher._downloader = MagicMock(spec=RatesDownloader)
+        fetcher._downloader.download.return_value = fetcher_return_value
+        fetcher._saver = MagicMock(spec=RatesSaver)
+        return fetcher
 
     @pytest.mark.parametrize('date, table', [
         (date(2015, 5, 30), 'A'), (date(2016, 11, 10), 'B'),
         (date(2016, 4, 10), 'C')
     ])
-    def test_download_uses_fetcher_and_saver(
-        self, downloader, date, table, fetcher_return_value):
-        downloader.download(date=date, table=table)
+    def test_fetch_uses_downloader_and_saver(
+        self, fetcher, date, table, fetcher_return_value):
+        fetcher.fetch(date=date, table=table)
 
-        downloader._fetcher.fetch.assert_called_once_with(date, table)
-        downloader._saver.save.assert_called_once_with(fetcher_return_value)
+        fetcher._downloader.download.assert_called_once_with(date, table)
+        fetcher._saver.save.assert_called_once_with(fetcher_return_value[0])
 
-    def test_download_raises_error_date_before_threshold(self, downloader):
+    def test_fetch_raises_error_date_before_threshold(self, fetcher):
         with pytest.raises(DateBeforeThreshold):
-            downloader.download(date(1999, 12, 31), table='A')
+            fetcher.fetch(date(1999, 12, 31), table='A')
 
-    def test_download_raises_error_incorrect_table(self, downloader):
-        with pytest.raises(TableNameInvalid):
-            downloader.download(date(2015, 12, 31), table='Z')
+    def test_download_raises_error_incorrect_table(self, fetcher):
+        with pytest.raises(InvalidTableType):
+            fetcher.fetch(date(2015, 12, 31), table='Z')
