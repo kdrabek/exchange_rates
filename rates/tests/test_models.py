@@ -3,7 +3,7 @@ from decimal import Decimal
 from freezegun import freeze_time
 import pytest
 
-from exchange_rates.rates.models import Currency, Rate, Table
+from rates.models import Currency, Rate, Table
 
 
 @pytest.mark.django_db

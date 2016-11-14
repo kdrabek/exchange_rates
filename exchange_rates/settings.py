@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'exchange_rates',
-    'exchange_rates.rates.apps.RatesConfig',
+    'rates.apps.RatesConfig',
 ]
 
 

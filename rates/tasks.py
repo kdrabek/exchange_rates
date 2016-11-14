@@ -4,8 +4,8 @@ from celery import Task
 from celery.utils.log import get_task_logger
 from exchange_rates import app
 
-from exchange_rates.rates.downloader.downloader import RatesDownloader
-from exchange_rates.rates.models import Table
+from rates.downloader.downloader import RatesDownloader
+from rates.models import Table
 
 
 logger = get_task_logger(__name__)

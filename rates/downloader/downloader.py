@@ -4,7 +4,7 @@ from decimal import Decimal
 from datetime import datetime, date
 import requests
 
-from exchange_rates.rates.models import Currency, Rate, Table
+from rates.models import Currency, Rate, Table
 
 
 log = logging.getLogger(__name__)

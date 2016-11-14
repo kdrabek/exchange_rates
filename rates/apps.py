@@ -4,7 +4,7 @@ from django.apps import apps, AppConfig
 
 
 class RatesConfig(AppConfig):
-    name = 'exchange_rates.rates'
+    name = 'rates'
 
     def ready(self):
         # Using a string here means the worker will not have to
