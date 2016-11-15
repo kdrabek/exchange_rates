@@ -1,7 +1,7 @@
 import logging
 from decimal import Decimal
 
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import requests
 
 from rates.models import Currency, Rate, Table
@@ -25,7 +25,7 @@ class RatesDownloader(object):
         response = requests.get(url)
         response.raise_for_status()
 
-        return response.json()[0]
+        return response.json()
 
     def _prepare_url(self, date, table):
         formatted_date = datetime.strftime(date, "%Y-%m-%d")
@@ -80,34 +80,38 @@ class RatesFetcher(object):
         self._downloader = RatesDownloader()
         self._saver = RatesSaver()
 
-    def fetch(self, date, table=DEFAULT_TABLE):
-        self.validate(date, table)
+    def find_date_to_fetch(self):
         try:
-            raw_data = self._downloader.download(date, table)
-        except Exception:
-            pass
-        else:
-            for rates_information in raw_data:
-                self._saver.save(rates_information)
-
-    def validate(self, date, table):
-        if date < self.THRESHOLD_DATE:
-            raise DateBeforeThreshold()
-        if table not in self.ALLOWED_TABLES:
-            raise InvalidTableType()
-
-    def _should_run(self, latest):
-        if latest and latest.date >= (datetime.utcnow() - timedelta(days=1)).date():
-            return False
-        return True
-
-    def _find_latest(self,):
-        try:
-            return Table.objects.latest('date')
+            last_entry = Table.objects.latest('date')
         except Table.DoesNotExist:
-            return None
+            return self.THRESHOLD_DATE
 
-    def _find_next_date(self, latest):
-        if not latest:
-            return RatesDownloader.THRESHOLD_DATE
-        return latest.date + timedelta(days=1)
+        if last_entry.date + timedelta(days=1) >= date.today():
+            return None
+        return self._next_workday(last_entry)
+
+    def _next_workday(self, last_entry):
+        next_day = last_entry.date + timedelta(days=1)
+        while next_day.weekday() >= 5:
+            next_day += timedelta(days=1)
+
+        return next_day
+
+    def fetch(self, date, table=DEFAULT_TABLE):
+        if not self.is_valid_request(date, table):
+            return
+
+        raw_data = self._downloader.download(date, table)
+        self.save_fetched_data(raw_data)
+
+    def save_fetched_data(self, raw_data):
+        for rates_information in raw_data:
+            self._saver.save(rates_information)
+
+    def is_valid_request(self, date, table):
+        if date < self.THRESHOLD_DATE:
+            return False
+        if table not in self.ALLOWED_TABLES:
+            return False
+
+        return True

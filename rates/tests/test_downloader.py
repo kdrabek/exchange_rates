@@ -24,14 +24,14 @@ class TestRatesDownloader(object):
     @use_cassette(os.path.join(HERE, 'cassettes/tableA.yml'))
     def test_fetch(self, downloader):
         response = downloader.download(date=date(2016, 11, 7), table='A')
-        sample_rate = response['rates'][0]
+        rates_dict = response[0]
 
-        assert isinstance(response, dict)
-        assert isinstance(response['rates'], list)
-        assert 'effectiveDate' in response
-        assert 'table' in response
-        assert 'no' in response
-        assert sorted(sample_rate.keys()) == sorted(
+        assert isinstance(response, list)
+        assert isinstance(rates_dict['rates'], list)
+        assert 'effectiveDate' in rates_dict
+        assert 'table' in rates_dict
+        assert 'no' in rates_dict
+        assert sorted(rates_dict['rates'][0].keys()) == sorted(
             ['code', 'currency', 'mid']
         )
 
@@ -101,9 +101,13 @@ class TestRatesFetcher(object):
         fetcher._saver.save.assert_called_once_with(fetcher_return_value[0])
 
     def test_fetch_raises_error_date_before_threshold(self, fetcher):
-        with pytest.raises(DateBeforeThreshold):
-            fetcher.fetch(date(1999, 12, 31), table='A')
+        fetcher.fetch(date(1999, 12, 31), table='A')
+
+        assert not fetcher._downloader.download.called
+        assert not fetcher._saver.save.called
 
     def test_download_raises_error_incorrect_table(self, fetcher):
-        with pytest.raises(InvalidTableType):
-            fetcher.fetch(date(2015, 12, 31), table='Z')
+        fetcher.fetch(date(2015, 12, 31), table='Z')
+
+        assert not fetcher._downloader.download.called
+        assert not fetcher._saver.save.called
