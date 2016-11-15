@@ -19,7 +19,7 @@ class TestCurrency(object):
 
 
 @pytest.mark.django_db
-@freeze_time("2016-11-12 10:00:00")
+@freeze_time("2016-11-09 10:00:00")
 class TestTable(object):
 
     def test_creates_valid_model(self, test_table):
@@ -33,7 +33,7 @@ class TestTable(object):
 
 
 @pytest.mark.django_db
-@freeze_time("2016-11-12 10:00:00")
+@freeze_time("2016-11-09 10:00:00")
 class TestRate(object):
 
     @pytest.fixture

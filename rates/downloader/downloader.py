@@ -1,7 +1,7 @@
-import logging
-from decimal import Decimal
-
 from datetime import datetime, date, timedelta
+from decimal import Decimal
+import logging
+
 import requests
 
 from rates.models import Currency, Rate, Table
@@ -17,9 +17,7 @@ class RatesDownloader(object):
 
     def download(self, date, table):
         log.info(
-            'Starting fetching rates info for date: {0} table: {1} '.format(
-                date, table
-            )
+            'Fetching rates for date: {0} table: {1} '.format(date, table)
         )
         url = self._prepare_url(date, table)
         response = requests.get(url)
@@ -36,6 +34,7 @@ class RatesSaver(object):
 
     def save(self, rates_info):
         table = self._create_or_update_table_info(rates_info)
+
         for rate in rates_info['rates']:
             table_type = rates_info['table']
             currency = self._create_or_update_currency(rate, table_type)
@@ -75,10 +74,11 @@ class RatesFetcher(object):
     DEFAULT_TABLE = 'A'
     ALLOWED_TABLES = ['A', 'B', 'C']
     THRESHOLD_DATE = date(2002, 1, 2)
+    ONE_DAY = timedelta(days=1)
 
     def __init__(self):
-        self._downloader = RatesDownloader()
-        self._saver = RatesSaver()
+        self.downloader = RatesDownloader()
+        self.saver = RatesSaver()
 
     def find_date_to_fetch(self):
         try:
@@ -86,14 +86,15 @@ class RatesFetcher(object):
         except Table.DoesNotExist:
             return self.THRESHOLD_DATE
 
-        if last_entry.date + timedelta(days=1) >= date.today():
+        if last_entry.date + self.ONE_DAY >= date.today():
             return None
         return self._next_workday(last_entry)
 
     def _next_workday(self, last_entry):
-        next_day = last_entry.date + timedelta(days=1)
-        while next_day.weekday() >= 5:
-            next_day += timedelta(days=1)
+        next_day = last_entry.date + self.ONE_DAY
+
+        while next_day.weekday() > 4:  # 4 = Friday
+            next_day += self.ONE_DAY
 
         return next_day
 
@@ -101,12 +102,9 @@ class RatesFetcher(object):
         if not self.is_valid_request(date, table):
             return
 
-        raw_data = self._downloader.download(date, table)
-        self.save_fetched_data(raw_data)
-
-    def save_fetched_data(self, raw_data):
+        raw_data = self.downloader.download(date, table)
         for rates_information in raw_data:
-            self._saver.save(rates_information)
+            self.saver.save(rates_information)
 
     def is_valid_request(self, date, table):
         if date < self.THRESHOLD_DATE:
