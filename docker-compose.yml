@@ -8,10 +8,6 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
-  redis:
-    image: redis:2.8.19
-    container_name: exchange_rates_redis
-    hostname: redis
   rabbit:
     hostname: rabbit
     container_name: exchange_rates_rabbit
@@ -34,7 +30,6 @@ services:
     links:
       - db:db
       - rabbit:rabbit
-      - redis:redis
   worker:
     build: .
     container_name: exchange_rates_worker
@@ -44,7 +39,6 @@ services:
     links:
       - db:db
       - rabbit:rabbit
-      - redis:redis
   scheduler:
     build: .
     container_name: exchange_rates_scheduler
@@ -54,7 +48,6 @@ services:
     links:
       - db:db
       - rabbit:rabbit
-      - redis:redis
       - web:web
   tests:
     build: .
@@ -64,4 +57,3 @@ services:
       - .:/app
     links:
       - db:db
-      - redis:redis
