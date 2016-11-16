@@ -12,3 +12,10 @@ class RatesConfig(AppConfig):
         app.config_from_object('django.conf:settings')
         installed_apps = [app_config.name for app_config in apps.get_app_configs()]
         app.autodiscover_tasks(lambda: installed_apps, force=True)
+
+        app.conf.beat_schedule = {
+            'fetch-rates': {
+                'task': 'rates.tasks.fetch_rates',
+                'schedule': 3600.0,
+            },
+        }
