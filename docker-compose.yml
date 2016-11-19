@@ -1,5 +1,6 @@
 version: "2"
 services:
+
   db:
     restart: always
     image: postgres:9.4
@@ -9,6 +10,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
+
   rabbit:
     restart: always
     hostname: rabbit
@@ -20,6 +22,7 @@ services:
     ports:
       - "5672"
       - "15672"
+
   web:
     restart: always
     build: .
@@ -33,6 +36,7 @@ services:
     links:
       - db:db
       - rabbit:rabbit
+
   worker:
     build: .
     restart: always
@@ -43,6 +47,7 @@ services:
     links:
       - db:db
       - rabbit:rabbit
+
   scheduler:
     restart: always
     build: .
@@ -54,6 +59,7 @@ services:
       - db:db
       - rabbit:rabbit
       - web:web
+
   tests:
     build: .
     container_name: exchange_rates_tests
@@ -62,6 +68,7 @@ services:
       - .:/app
     links:
       - db:db
+
   nginx:
     build: ./nginx/
     restart: always
