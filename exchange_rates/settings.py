@@ -39,8 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'exchange_rates',
     'rates.apps.RatesConfig',
+    'authentication.apps.AuthenticationConfig',
 ]
 
 
@@ -138,6 +140,8 @@ CELERYD_MAX_TASKS_PER_CHILD = 1000
 
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
+AUTH_USER_MODEL = 'authentication.User'
+AUTHENTICATION_BACKENDS = ['authentication.backends.EmailAuthenticationBackend', ]
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -167,6 +171,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 STATIC_URL = '/static/'
+STATIC_ROOT = "/app/static/"
 
 LOGGING = {
     'version': 1,

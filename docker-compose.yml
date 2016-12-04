@@ -43,17 +43,16 @@ services:
     links:
       - db:db
       - rabbit:rabbit
-  scheduler:
-    restart: always
+  shell:
     build: .
-    container_name: exchange_rates_scheduler
-    command: ./run_celery_scheduler.sh
+    restart: always
+    container_name: exchange_rates_shell
+    command: tail -f /dev/null
     volumes:
       - .:/app
     links:
       - db:db
       - rabbit:rabbit
-      - web:web
   tests:
     build: .
     container_name: exchange_rates_tests
@@ -69,8 +68,6 @@ services:
     ports:
       - "80:80"
     volumes:
-      - /www/static
-    volumes_from:
-      - web
+      - .:/app
     links:
       - web:web
