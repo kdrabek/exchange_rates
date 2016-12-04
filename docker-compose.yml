@@ -28,8 +28,8 @@ services:
     command: ./run_web.sh
     volumes:
       - .:/app
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
     links:
       - db:db
       - rabbit:rabbit
@@ -62,12 +62,11 @@ services:
     links:
       - db:db
   nginx:
-    build: ./nginx/
     restart: always
-    container_name: exchange_rates_nginx
+    build: ./nginx/
     ports:
       - "80:80"
-    volumes:
-      - .:/app
+    volumes_from:
+      - web
     links:
       - web:web
