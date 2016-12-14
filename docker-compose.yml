@@ -31,8 +31,8 @@ services:
     expose:
       - "8000"
     links:
-      - db:db
-      - rabbit:rabbit
+      - db
+      - rabbit
   worker:
     build: .
     restart: always
@@ -41,8 +41,8 @@ services:
     volumes:
       - .:/app
     links:
-      - db:db
-      - rabbit:rabbit
+      - db
+      - rabbit
   shell:
     build: .
     restart: always
@@ -51,16 +51,8 @@ services:
     volumes:
       - .:/app
     links:
-      - db:db
-      - rabbit:rabbit
-  tests:
-    build: .
-    container_name: exchange_rates_tests
-    command: py.test
-    volumes:
-      - .:/app
-    links:
-      - db:db
+      - db
+      - rabbit
   nginx:
     restart: always
     build: ./nginx/
@@ -69,4 +61,4 @@ services:
     volumes_from:
       - web
     links:
-      - web:web
+      - web
