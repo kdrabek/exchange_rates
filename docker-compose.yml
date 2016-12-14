@@ -1,6 +1,5 @@
 version: "2"
 services:
-
   db:
     restart: always
     image: postgres:9.4
@@ -10,7 +9,6 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
-
   rabbit:
     restart: always
     hostname: rabbit
@@ -22,7 +20,6 @@ services:
     ports:
       - "5672"
       - "15672"
-
   web:
     restart: always
     build: .
@@ -31,12 +28,11 @@ services:
     command: ./run_web.sh
     volumes:
       - .:/app
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
     links:
       - db:db
       - rabbit:rabbit
-
   worker:
     build: .
     restart: always
@@ -47,19 +43,16 @@ services:
     links:
       - db:db
       - rabbit:rabbit
-
-  scheduler:
-    restart: always
+  shell:
     build: .
-    container_name: exchange_rates_scheduler
-    command: ./run_celery_scheduler.sh
+    restart: always
+    container_name: exchange_rates_shell
+    command: tail -f /dev/null
     volumes:
       - .:/app
     links:
       - db:db
       - rabbit:rabbit
-      - web:web
-
   tests:
     build: .
     container_name: exchange_rates_tests
@@ -68,15 +61,11 @@ services:
       - .:/app
     links:
       - db:db
-
   nginx:
-    build: ./nginx/
     restart: always
-    container_name: exchange_rates_nginx
+    build: ./nginx/
     ports:
       - "80:80"
-    volumes:
-      - /www/static
     volumes_from:
       - web
     links:

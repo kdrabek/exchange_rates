@@ -6,8 +6,7 @@ from mock import patch, MagicMock, sentinel
 from vcr import use_cassette
 
 from rates.downloader.downloader import (
-    RatesFetcher, RatesSaver, RatesDownloader, DateBeforeThreshold,
-    InvalidTableType
+    RatesFetcher, RatesSaver, RatesDownloader,
 )
 from rates.models import Table, Rate, Currency
 

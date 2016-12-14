@@ -14,9 +14,13 @@ logger = get_task_logger(__name__)
 def fetch_rates():
     fetcher = RatesFetcher()
     next_date = fetcher.find_date_to_fetch()
-    if next_date:
+    if not next_date:
+        return
+
+    while True:
         try:
             fetcher.fetch(next_date)
         except Exception as e:
             next_date += fetcher.ONE_DAY
-            return fetcher.fetch(next_date)
+        else:
+            break
