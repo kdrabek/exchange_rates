@@ -1,15 +1,9 @@
-import json
-
-from django.shortcuts import render_to_response, redirect
-from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseBadRequest
-from django.views.generic import View
-from django.template import RequestContext
-
 from django.contrib.auth import authenticate
-from django.views.decorators.csrf import csrf_exempt
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
+from rest_framework import status
 
 from authentication.models import User
 
@@ -21,18 +15,22 @@ class LoginView(APIView):
         password = request.POST.get('password')
 
         if not email or not password:
-            return HttpResponseBadRequest(
-                json.dumps({'error': 'Password or email is missing'})
+            return Response(
+                {'error': 'Password or email is missing'},
+                status=status.HTTP_400_BAD_REQUEST
             )
 
         user = authenticate(email=email, password=password)
         if user is not None:
-            return HttpResponse(
-                json.dumps({'result': 'Success'})
+            token = Token.objects.get(user=user.id)
+            return Response(
+                {'token': token.key},
+                status=status.HTTP_200_OK
             )
-            # generate JWT
-        return HttpResponse(
-            json.dumps({'oops': 'something went wrong', 'user': user})
+
+        return Response(
+            {'error': 'Could not authenticate using provided credentials'},
+            status=status.HTTP_400_BAD_REQUEST
         )
 
 
@@ -43,19 +41,23 @@ class RegisterView(APIView):
         password = request.POST.get('password')
 
         if not email or not password:
-            return HttpResponseBadRequest(
-                json.dumps({'error': 'Password or email is missing'})
+            return Response(
+                {'error': 'Password or email is missing'},
+                status=status.HTTP_400_BAD_REQUEST
             )
 
         try:
-            user = User.objects.get(email=email)
+            User.objects.get(email=email)
         except User.DoesNotExist:
             user = User.objects.create_user(email=email, password=password)
-            return HttpResponse(
-                json.dumps({'user': user.id})
+            token = Token.objects.get(user=user.id)
+
+            return Response(
+                {'user': user.id, 'token': token.key},
+                status=status.HTTP_200_OK
             )
-            # generate JWT
         else:
-            return HttpResponseBadRequest(
-                json.dumps({'error': 'User already exists.'})
+            return Response(
+                {'error': 'User already exists.'},
+                status=status.HTTP_400_BAD_REQUEST
             )

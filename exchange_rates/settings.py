@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'exchange_rates',
     'rates.apps.RatesConfig',
     'authentication.apps.AuthenticationConfig',
@@ -202,4 +203,11 @@ LOGGING = {
             'level': 'INFO',
         }
     }
+}
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    )
 }

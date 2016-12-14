@@ -1,5 +1,4 @@
 from django.conf.urls import url
-from django.contrib import admin
 
 from authentication.views import LoginView, RegisterView
 
