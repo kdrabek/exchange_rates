@@ -27,7 +27,6 @@ class LoginView(APIView):
                 {'token': token.key},
                 status=status.HTTP_200_OK
             )
-
         return Response(
             {'error': 'Could not authenticate using provided credentials'},
             status=status.HTTP_400_BAD_REQUEST
