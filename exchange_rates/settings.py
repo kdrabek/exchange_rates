@@ -141,8 +141,6 @@ CELERYD_MAX_TASKS_PER_CHILD = 1000
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
 AUTH_USER_MODEL = 'authentication.User'
-AUTHENTICATION_BACKENDS = ['authentication.backends.EmailAuthenticationBackend', ]
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
