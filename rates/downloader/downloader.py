@@ -5,7 +5,6 @@ import logging
 import requests
 
 from rates.models import Currency, Rate, Table
-from rates.downloader.exceptions import DateBeforeThreshold, InvalidTableType
 
 
 log = logging.getLogger(__name__)
