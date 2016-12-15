@@ -13,5 +13,5 @@ install:
 script:
   - docker-compose build
   - docker-compose up -d shell
-  - wait 30
+  - sleep 30
   - docker-compose exec shell bash -c "py.test"
