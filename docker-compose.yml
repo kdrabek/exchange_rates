@@ -51,8 +51,8 @@ services:
     volumes:
       - .:/app
     links:
-      - db
-      - rabbit
+      - db:db
+      - rabbit:rabbit
   nginx:
     restart: always
     build: ./nginx/
