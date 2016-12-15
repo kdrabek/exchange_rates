@@ -2,7 +2,6 @@ sudo: required
 
 language: python
 python:
-  - "3.4"
   - "3.5"
 
 services:
@@ -14,4 +13,5 @@ install:
 script:
   - docker-compose build
   - docker-compose up -d shell
+  - sleep 30
   - docker-compose exec shell bash -c "py.test"
