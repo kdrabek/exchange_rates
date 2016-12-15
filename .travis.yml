@@ -1,8 +1,18 @@
+sudo: required
+
 language: python
 python:
   - "3.4"
   - "3.5"
+
 services:
-  - postgresql
-install: "pip install -r requirements.txt && pip install -r requirements_dev.txt"
-script: py.test
+  - docker
+
+install:
+  - sudo pip install docker-compose
+
+script:
+  - ls -lah
+  - docker-compose up -d shell
+  - wait 5
+  - docker-compose exec shell bash -c "py.test"
