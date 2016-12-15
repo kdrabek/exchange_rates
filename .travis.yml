@@ -12,7 +12,6 @@ install:
   - sudo pip install docker-compose
 
 script:
-  - ls -lah
+  - docker-compose build
   - docker-compose up -d shell
-  - wait 5
   - docker-compose exec shell bash -c "py.test"
