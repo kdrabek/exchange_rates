@@ -1,10 +1,7 @@
-from datetime import datetime, timedelta
-
 from celery.utils.log import get_task_logger
 
 from exchange_rates import app
 from rates.downloader.downloader import RatesFetcher
-from rates.models import Table
 
 
 logger = get_task_logger(__name__)
