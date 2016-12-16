@@ -20,4 +20,5 @@ from django.contrib import admin
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^auth/', include('authentication.urls', namespace='auth')),
+    url(r'^rates/', include('rates.urls', namespace='rates')),
 ]

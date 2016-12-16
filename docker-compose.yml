@@ -33,6 +33,7 @@ services:
     links:
       - db
       - rabbit
+      - nginx
   worker:
     build: .
     restart: always
@@ -51,14 +52,12 @@ services:
     volumes:
       - .:/app
     links:
-      - db:db
-      - rabbit:rabbit
+      - db
+      - rabbit
   nginx:
     restart: always
     build: ./nginx/
     ports:
       - "80:80"
-    volumes_from:
-      - web
-    links:
-      - web
+    volumes:
+      - .:/app
