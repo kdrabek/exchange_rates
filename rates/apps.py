@@ -16,6 +16,6 @@ class RatesConfig(AppConfig):
         app.conf.beat_schedule = {
             'fetch-rates': {
                 'task': 'rates.tasks.fetch_rates',
-                'schedule': 600.0,
+                'schedule': 3600.0,
             },
         }

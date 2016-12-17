@@ -16,3 +16,5 @@ class User(AbstractBaseUser):
 
     def __str__(self):
         return '<User email: {0}>'.format(self.email)
+
+    __repr__ = __str__
