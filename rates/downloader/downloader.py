@@ -72,7 +72,7 @@ class RatesFetcher(object):
 
     DEFAULT_TABLE = 'A'
     ALLOWED_TABLES = ['A', 'B', 'C']
-    THRESHOLD_DATE = date(2002, 1, 2)
+    THRESHOLD_DATE = date(2010, 1, 1)
     ONE_DAY = timedelta(days=1)
 
     def __init__(self):

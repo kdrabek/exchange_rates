@@ -1,24 +1,30 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.renderers import JSONRenderer
 from rest_framework import status
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from rates.models import Currency
 from rates.serializers import CurrencySerializer
 
 
+class PingView(APIView):
+
+    def get(self, request, format=None):
+        return Response({'response': 'pong'}, status=status.HTTP_200_OK)
+
+
 class CurrencyView(APIView):
+
+    authentication_classes = (TokenAuthentication, )
+    permission_classes = (IsAuthenticated, )
 
     def get(self, request, format=None):
         queryset = Currency.objects.all()
         queryset = self._append_query_filters(queryset, request.query_params)
-        json = self._prepare_json(queryset)
-
-        return Response(json, status=status.HTTP_200_OK)
-
-    def _prepare_json(self, queryset):
         serializer = CurrencySerializer(queryset, many=True)
-        return JSONRenderer().render(serializer.data)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def _append_query_filters(self, queryset, query_params):
         queryset = self._append_code_filter(queryset, query_params)
