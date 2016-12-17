@@ -15,6 +15,8 @@
     <content url="file://$MODULE_DIR$" />
     <orderEntry type="jdk" jdkName="Python 3.5.1+ virtualenv at ~/.virtualenvs/engineer" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="exchange_rates_front" />
+    <orderEntry type="module" module-name="exchange_rates_front" />
   </component>
   <component name="TemplatesService">
     <option name="TEMPLATE_CONFIGURATION" value="Django" />
