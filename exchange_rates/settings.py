@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'exchange_rates',
     'rates.apps.RatesConfig',
     'authentication.apps.AuthenticationConfig',
+    'notifications.apps.NotificationsConfig',
 ]
 
 
@@ -215,3 +216,16 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.BrowsableAPIRenderer',
     )
 }
+
+
+# EMAIL SETTINGS
+
+EMAIL_USE_TLS = True
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_PASSWORD = os.environ.get("NOTIFICATIONS_EMAIL_PASSWORD")
+EMAIL_HOST_USER = os.environ.get("NOTIFICATIONS_EMAIL_USER")
+EMAIL_PORT = 587
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# END EMAIL SETTINGS

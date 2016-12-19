@@ -1,0 +1,26 @@
+<html>
+  <body>
+    <h3>Witamy,</h3>
+    <p>Otrzymujesz to powiadomienie, ponieważ spełniony został
+      ustanowiony warunek.</p>
+    <p>
+      Kurs <strong>{{ notification.currency.code }}</strong> wynosi
+      obecnie <strong>{{ rate.rate }}</strong> i jest
+      {%if notification.threshold == 'ABOVE' %}
+        <em>wyższy</em>
+      {% else %}
+        <em>niższy</em>
+      {% endif %}
+      niż wartość graniczna {{ notification.rate }}.
+    </p>
+    <p>Kliknij <u>tutaj</u> aby zobaczyć szczegóły.</p>
+
+    <p>
+      <em>
+        UWAGA: Ta wiadomość została wygenerowana automatycznie.
+        Aby nie otrzymywać więcej powiadomień zaloguj się na swoje konto
+        i usuń ustawiony alarm.
+      </em>
+    </p>
+  </body>
+ </html>
