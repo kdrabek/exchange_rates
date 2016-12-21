@@ -2,6 +2,7 @@ freezegun
 django_extensions
 pytest
 pytest-django
+pytest-cov
 ipython
 ipdb
 mock

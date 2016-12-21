@@ -13,5 +13,5 @@ class Notification(models.Model):
 
     user = models.ForeignKey('authentication.User')
     currency = models.ForeignKey('rates.Currency')
-    rate = models.DecimalField(max_digits=6, decimal_places=4)
+    rate = models.DecimalField(max_digits=6, decimal_places=2)
     threshold = models.CharField(max_length=5, choices=THRESHOLD_CHOICES)

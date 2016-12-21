@@ -196,7 +196,7 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['stream'],
+            'handlers': ['stream', 'file'],
             'propagate': True,
         },
         'exchange_rates': {
