@@ -1,10 +1,7 @@
 import pytest
 import mock
 
-from authentication.models import User
-from notifications.models import Notification
 from notifications.permissions import IsOwner
-from rates.models import Currency
 
 
 @pytest.mark.django_db

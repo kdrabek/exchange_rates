@@ -27,7 +27,7 @@ def currency(db):
 @pytest.fixture
 def notification(db, user, currency):
     return Notification.objects.create(
-            user=user, currency=currency, rate='12.3456', threshold='ABOVE'
+            user=user, currency=currency, rate='12.34', threshold='ABOVE'
         )
 
 
@@ -38,7 +38,13 @@ def table(db):
         when_fetched=datetime.utcnow()
     )
 
+
 @pytest.fixture
 def rate(db, currency, table):
     return Rate.objects.create(
         currency=currency, rate=Decimal('1.2345'), table=table)
+
+
+@pytest.fixture
+def token(user):
+    return user.auth_token.key
