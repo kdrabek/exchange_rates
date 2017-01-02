@@ -115,13 +115,6 @@ if not BROKER_URL:
 BROKER_POOL_LIMIT = 1
 BROKER_CONNECTION_TIMEOUT = 10
 
-# Celery configuration
-# configure queues, currently we have only one
-CELERY_DEFAULT_QUEUE = 'default'
-CELERY_QUEUES = (
-    Queue('default', Exchange('default'), routing_key='default'),
-)
-
 # Sensible settings for celery
 CELERY_ALWAYS_EAGER = False
 CELERY_ACKS_LATE = True
