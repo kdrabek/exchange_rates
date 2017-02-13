@@ -21,31 +21,25 @@ def get_operator(threshold):
 def process_user_notifications():
     for user in User.objects.all():
         for notification in Notification.objects.filter(user=user):
-            verify_notification_condition.delay(notification.id)
+            send_notification_email(notification.id)
 
 
-@app.task
-def verify_notification_condition(notification_id):
+def send_notification_email(notification_id):
     notification = Notification.objects.get(id=notification_id)
     last_rate = Rate.objects.filter(currency=notification.currency).order_by(
         'table__date').last()
     operator = get_operator(notification.threshold)
+    print("porownuje")
     if operator(last_rate.rate, notification.rate):
-        send_notification_email.delay(notification.id, last_rate.id)
+        print("spelniony warunek")
+        html_message = render_to_string(
+            'mail.html', {'notification': notification, 'rate': last_rate}
+        )
 
-
-@app.task
-def send_notification_email(notification_id, rate_id):
-    notification = Notification.objects.get(id=notification_id)
-    rate = Rate.objects.get(id=rate_id)
-    html_message = render_to_string(
-        'mail.html', {'notification': notification, 'rate': rate}
-    )
-
-    send_mail(
-        subject='Notification',
-        message='A text message',
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[notification.user.email],
-        html_message=html_message
-    )
+        send_mail(
+            subject='Notification',
+            message='A text message',
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[notification.user.email],
+            html_message=html_message
+        )

@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'rates.apps.RatesConfig',
     'authentication.apps.AuthenticationConfig',
     'notifications.apps.NotificationsConfig',
+    'corsheaders',
 ]
 
 
@@ -57,6 +58,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'exchange_rates.urls'
@@ -222,3 +224,4 @@ EMAIL_PORT = 587
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # END EMAIL SETTINGS
+CORS_ORIGIN_ALLOW_ALL = True
