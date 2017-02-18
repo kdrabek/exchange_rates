@@ -4,14 +4,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from rates.models import Currency
+from rates.models import Currency, Rate
 from rates.serializers import CurrencySerializer
-
-
-class PingView(APIView):
-
-    def get(self, request, format=None):
-        return Response({'response': 'pong'}, status=status.HTTP_200_OK)
 
 
 class CurrencyView(APIView):
@@ -35,3 +29,12 @@ class CurrencyView(APIView):
         if code is not None:
             queryset = queryset.filter(code=code.upper())
         return queryset
+
+
+class RatesView(APIView):
+
+    def get(self, request, format=None):
+        queryset = Rate.objects.all()
+        serializer = CurrencySerializer(queryset, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)

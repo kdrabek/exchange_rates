@@ -16,8 +16,8 @@ app.conf.task_routes = {
 }
 app.conf.beat_schedule = {
     'fetch_rates': {
-        'task': 'rates.tasks.fetch_rates',
-        'schedule': 360000.0,
+        'task': 'rates.tasks.find_rates_to_fetch',
+        'schedule': 6000000.0,
         'args': ()
     },
     'send_notifications': {

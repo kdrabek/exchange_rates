@@ -17,8 +17,9 @@ HERE = os.path.dirname(os.path.realpath(__file__))
 class TestRatesDownloader(object):
 
     @pytest.fixture
+    @freezegun.freeze_time('2017-02-10 20:00:00')
     def downloader(self):
-        return RatesDownloader()
+        return RatesDownloader(threshold_date=date.today()-timedelta(days=90))
 
     def assert_rate_dict_is_correct(self, rates_dict):
         single_rate_dict = rates_dict['rates'][0]

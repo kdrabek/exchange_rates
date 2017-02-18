@@ -1,4 +1,4 @@
-from datetime import datetime, date, timedelta
+from datetime import datetime
 from decimal import Decimal
 import logging
 
@@ -13,12 +13,11 @@ log = logging.getLogger(__name__)
 class RatesDownloader(object):
 
     BASE_URL = 'http://api.nbp.pl/api/exchangerates/tables/{table}/{date}'
-    DEFAULT_TABLE = 'A'
     ALLOWED_TABLES = ['A', 'B', 'C']
-    THRESHOLD_DATE = date.today() - timedelta(days=90)  # fetch last 90 days
 
-    def __init__(self):
+    def __init__(self, threshold_date):
         self.saver = RatesSaver()
+        self.threshold_date = threshold_date
 
     def download(self, date, table):
         if not self._is_valid_request(date, table):
@@ -28,7 +27,6 @@ class RatesDownloader(object):
         url = self._prepare_url(date, table)
         response = requests.get(url)
         response.raise_for_status()
-
         return response.json()
 
     def _prepare_url(self, date, table):
@@ -36,7 +34,7 @@ class RatesDownloader(object):
         return self.BASE_URL.format(table=table, date=formatted_date)
 
     def _is_valid_request(self, date, table):
-        if not self.THRESHOLD_DATE <= date <= date.today():
+        if not self.threshold_date <= date <= date.today():
             return False
 
         return table in self.ALLOWED_TABLES
@@ -64,7 +62,7 @@ class RatesSaver(object):
             )
 
     def _save_rate(self, rate, currency, table):
-        new_rate = Rate.objects.create(
+        Rate.objects.create(
             currency=currency,
             table=table,
             rate=Decimal(rate['mid'])
