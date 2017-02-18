@@ -18,6 +18,8 @@ class RatesSerializer(serializers.Serializer):
 
     currency = serializers.ReadOnlyField(source='currency.code')
 
+    name = serializers.ReadOnlyField(source='currency.name')
+
     rate = serializers.DecimalField(
         required=True, decimal_places=2, max_digits=6
     )

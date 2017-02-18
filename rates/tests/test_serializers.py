@@ -39,5 +39,5 @@ class TestRatesSerializer(object):
         rate = Rate(currency=currency, rate=Decimal('12.34'))
 
         assert serializer(rate).data == {
-            'currency': 'ABC', 'rate': '12.34'
+            'currency': 'ABC', 'rate': '12.34', 'name': 'Test Currency'
         }

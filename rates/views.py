@@ -53,7 +53,7 @@ class RatesView(APIView):
         if not date:
             return Table.objects.latest('date')
         else:
-            requested_date = datetime.strptime(date, "%d-%m-%Y").date()
+            requested_date = datetime.strptime(date, '%Y-%m-%d').date()
             return (
                 Table.objects
                 .filter(date__lte=requested_date)
