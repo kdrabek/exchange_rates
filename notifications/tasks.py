@@ -29,9 +29,7 @@ def send_notification_email(notification_id):
     last_rate = Rate.objects.filter(currency=notification.currency).order_by(
         'table__date').last()
     operator = get_operator(notification.threshold)
-    print("porownuje")
     if operator(last_rate.rate, notification.rate):
-        print("spelniony warunek")
         html_message = render_to_string(
             'mail.html', {'notification': notification, 'rate': last_rate}
         )

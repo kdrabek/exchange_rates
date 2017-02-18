@@ -5,7 +5,7 @@
       ustanowiony warunek.</p>
     <p>
       Kurs <strong>{{ notification.currency.code }}</strong> wynosi
-      obecnie <strong>{{ rate.rate }}</strong> i jest
+      obecnie <strong>{{ rate.rate|floatformat:2 }}</strong> i jest
       {%if notification.threshold == 'ABOVE' %}
         <em>wyższy</em>
       {% else %}
