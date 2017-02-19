@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -7,7 +8,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from rates.models import Currency, Rate, Table
-from rates.serializers import CurrencySerializer, RatesSerializer
+from rates.serializers import (
+    CurrencySerializer, RatesSerializer, RateDetailsSerializer
+)
 
 
 class CurrencyView(APIView):
@@ -56,3 +59,20 @@ class RatesView(APIView):
                 .order_by('-date')
                 .first()
             )
+
+
+class RateDetailsView(APIView):
+
+    authentication_classes = (TokenAuthentication, )
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, currency_code, limit=5):
+        currency = get_object_or_404(Currency, code=currency_code)
+
+        queryset = Rate.objects.filter(
+            currency=currency).order_by('-table__date')[:int(limit)]
+        serializer = RateDetailsSerializer(queryset, many=True)
+        return Response(
+            {'limit': limit, 'rates': serializer.data},
+            status=status.HTTP_200_OK
+        )

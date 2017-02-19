@@ -17,6 +17,9 @@ class Rate(models.Model):
     rate = models.DecimalField(max_digits=6, decimal_places=4)
     table = models.ForeignKey('Table')
 
+    class Meta:
+        unique_together = ("currency", "table")
+
     def __repr__(self):
         return '<Rate currency: {0} table: {1}>'.format(
             self.currency.code, self.table.id)

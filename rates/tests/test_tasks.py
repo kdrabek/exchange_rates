@@ -81,10 +81,10 @@ class TestRatesFetchingCoordinator(object):
 
     def test_get_days_after_threshold(self, coordinator):
         coordinator.THRESHOLD_DATE = date.today() - timedelta(days=1)
+        days_after_threshold = list(coordinator.get_days_after_threshold())
+        expected = [date.today()-timedelta(days=1), date.today()]
 
-        assert list(coordinator.get_days_after_threshold()) == [
-            date.today()-timedelta(days=1), date.today()
-        ]
+        assert sorted(days_after_threshold) == sorted(expected)
 
     def test_get_already_downloaded_dates(self, coordinator, table):
         downloaded = coordinator.get_already_downloaded_dates()
