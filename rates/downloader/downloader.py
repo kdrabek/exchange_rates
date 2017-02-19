@@ -2,6 +2,7 @@ from datetime import datetime
 from decimal import Decimal
 import logging
 
+from django.core.exceptions import ValidationError
 import requests
 
 from rates.models import Currency, Rate, Table
@@ -50,11 +51,14 @@ class RatesSaver(object):
             )
 
     def _save_rate(self, rate, currency, table):
-        Rate.objects.create(
-            currency=currency,
-            table=table,
-            rate=Decimal(rate['mid'])
-        )
+        try:
+            Rate.objects.create(
+                currency=currency,
+                table=table,
+                rate=Decimal(rate['mid'])
+            )
+        except ValidationError as e:
+            log.error("Rates for %s for %s already exist.", currency, table)
 
     def _create_or_update_currency(self, rate, table_type):
         try:

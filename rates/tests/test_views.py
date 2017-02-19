@@ -3,14 +3,15 @@ from datetime import date, datetime, timedelta
 import pytest
 
 from django.core.urlresolvers import reverse
-from rest_framework.status import HTTP_200_OK, HTTP_401_UNAUTHORIZED
+from rest_framework.status import (
+    HTTP_200_OK, HTTP_401_UNAUTHORIZED, HTTP_404_NOT_FOUND
+)
 
 from rates.models import Currency, Rate, Table
 from authentication.models import User
 
 
-@pytest.mark.django_db
-class TestCurrencyView(object):
+class Fixtures(object):
 
     @pytest.fixture
     def saved_currencies(self):
@@ -26,6 +27,31 @@ class TestCurrencyView(object):
     @pytest.fixture
     def token(self, user):
         return user.auth_token.key
+
+    @pytest.fixture
+    def saved_currency(self):
+        currency = Currency(code='ABC', name='Currency', table_type='A')
+        currency.save()
+        return currency
+
+    @pytest.fixture
+    def saved_table(self):
+        table = Table(
+            id='some-id', type='A', date=date.today(),
+            when_fetched=datetime.utcnow())
+        table.save()
+        return table
+
+    @pytest.fixture
+    def saved_rate(self, saved_currency, saved_table):
+        rate = Rate(
+            rate=Decimal('12.34'), table=saved_table, currency=saved_currency)
+        rate.save()
+        return rate
+
+
+@pytest.mark.django_db
+class TestCurrencyView(Fixtures):
 
     def assert_response(self, response, expected_len, expected_keys):
         data = response.json()
@@ -69,28 +95,7 @@ class TestCurrencyView(object):
 
 
 @pytest.mark.django_db
-class TestRatesView(object):
-
-    @pytest.fixture
-    def saved_currency(self):
-        currency = Currency(code='ABC', name='Currency', table_type='A')
-        currency.save()
-        return currency
-
-    @pytest.fixture
-    def saved_table(self):
-        table = Table(
-            id='some-id', type='A', date=date.today(),
-            when_fetched=datetime.utcnow())
-        table.save()
-        return table
-
-    @pytest.fixture
-    def saved_rate(self, saved_currency, saved_table):
-        rate = Rate(
-            rate=Decimal('12.34'), table=saved_table, currency=saved_currency)
-        rate.save()
-        return rate
+class TestRatesView(Fixtures):
 
     @pytest.fixture
     def today(self):
@@ -131,3 +136,57 @@ class TestRatesView(object):
         )
         # because we don't have future rates, today's are fetched
         self.assert_response(response, expected_date=today)
+
+
+@pytest.mark.django_db
+class TestRatesDetailsView(Fixtures):
+
+    def test_unauthenticated_user_is_unauthorized(self, client):
+        response = client.get(
+            reverse(
+                'rates:rate_detail_view',
+                kwargs={'currency_code': 'AUD', 'limit': 5}
+            )
+        )
+
+        assert response.status_code == HTTP_401_UNAUTHORIZED
+
+    def test_get_rates_details(self, client, saved_rate, user, token):
+        limit = 1
+        response = client.get(
+            reverse(
+                'rates:rate_detail_view',
+                kwargs={
+                    'currency_code':  saved_rate.currency.code,
+                    'limit': limit
+                }
+            ),
+            HTTP_AUTHORIZATION='Token {}'.format(token)
+        )
+
+        json = response.json()
+
+        assert response.status_code == HTTP_200_OK
+        assert len(json['rates']) == limit
+        assert json['rates'][0] == {
+            'currency': saved_rate.currency.code,
+            'date': str(saved_rate.table.date),
+            'name': saved_rate.currency.name,
+            'rate': '{0:.4f}'.format(saved_rate.rate)
+        }
+
+    def test_get_rates_details_404_for_non_existing_currency_code(
+            self, client, saved_rate, user, token):
+        limit = 1
+        response = client.get(
+            reverse(
+                'rates:rate_detail_view',
+                kwargs={
+                    'currency_code': 'XYZ',
+                    'limit': limit
+                }
+            ),
+            HTTP_AUTHORIZATION='Token {}'.format(token)
+        )
+
+        assert response.status_code == HTTP_404_NOT_FOUND

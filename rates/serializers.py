@@ -23,3 +23,8 @@ class RatesSerializer(serializers.Serializer):
     rate = serializers.DecimalField(
         required=True, decimal_places=4, max_digits=6
     )
+
+
+class RateDetailsSerializer(RatesSerializer):
+
+    date = serializers.ReadOnlyField(source='table.date')
