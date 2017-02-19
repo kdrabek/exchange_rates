@@ -5,3 +5,4 @@ celery
 psycopg2==2.5.3
 requests
 redis==2.10.5
+django-cors-headers

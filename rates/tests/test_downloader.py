@@ -1,24 +1,25 @@
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 import os
 
+import freezegun
 import pytest
-from mock import patch, MagicMock, sentinel
+import mock
 from vcr import use_cassette
 
-from rates.downloader.downloader import (
-    RatesFetcher, RatesSaver, RatesDownloader,
-)
+from rates.downloader.downloader import RatesSaver, RatesDownloader
 from rates.models import Table, Rate, Currency
 
 
 HERE = os.path.dirname(os.path.realpath(__file__))
 
 
+@freezegun.freeze_time('2017-02-10 20:00:00')
 class TestRatesDownloader(object):
 
     @pytest.fixture
+    @freezegun.freeze_time('2017-02-10 20:00:00')
     def downloader(self):
-        return RatesDownloader()
+        return RatesDownloader(threshold_date=date.today()-timedelta(days=90))
 
     def assert_rate_dict_is_correct(self, rates_dict):
         single_rate_dict = rates_dict['rates'][0]
@@ -32,18 +33,33 @@ class TestRatesDownloader(object):
         )
 
     @use_cassette(os.path.join(HERE, 'cassettes/tableA.yml'))
-    def test_fetch(self, downloader):
-        response = downloader.download(date=date(2016, 11, 7), table='A')
+    @freezegun.freeze_time('2016-11-07 20:00:00')  # changing will change vcr
+    def test_download(self, downloader):
+        with mock.patch.object(downloader, '_is_valid_request') as m:
+            m.return_value = True
+            response = downloader.download(date=date.today(), table='A')
         rates_dict = response[0]
 
         assert isinstance(response, list)
         self.assert_rate_dict_is_correct(rates_dict)
 
+    def test_download_when_date_in_the_future(self, downloader):
+        future_date = date.today() + timedelta(days=4)
+        response = downloader.download(date=future_date, table='A')
 
-    @patch('rates.downloader.downloader.requests')
+        assert response is None
+
+    def test_download_when_date_before_threshold(self, downloader):
+        before_threshold_date = date.today() - timedelta(days=91)
+        response = downloader.download(date=before_threshold_date, table='A')
+
+        assert response is None
+
+    @mock.patch('rates.downloader.downloader.requests')
     def test_fetch_get_uses_correct_url(self, mock_requests, downloader):
-        downloader.download(date=date(2016, 11, 7), table='A')
-        expected_url = downloader.BASE_URL.format(table='A', date='2016-11-07')
+        downloader.download(date=date.today(), table='A')
+        formatted = datetime.strftime(date.today(), "%Y-%m-%d")
+        expected_url = downloader.BASE_URL.format(table='A', date=formatted)
 
         mock_requests.get.assert_called_once_with(expected_url)
 
@@ -78,69 +94,3 @@ class TestRatesSaver(object):
         assert len(Rate.objects.all()) == 1
         assert len(Table.objects.all()) == 1
         assert len(Currency.objects.all()) == 1
-
-
-@pytest.mark.django_db
-class TestRatesFetcher(object):
-
-    @pytest.fixture
-    def downloader_return_value(self):
-        return [sentinel]
-
-    @pytest.fixture
-    def fetcher(self, downloader_return_value):
-        fetcher = RatesFetcher()
-        fetcher.downloader = MagicMock(spec=RatesDownloader)
-        fetcher.downloader.download.return_value = downloader_return_value
-        fetcher.saver = MagicMock(spec=RatesSaver)
-        return fetcher
-
-    @pytest.mark.parametrize('date, table', [
-        (date(2015, 5, 30), 'A'), (date(2016, 11, 10), 'B'),
-        (date(2016, 4, 10), 'C')
-    ])
-    def test_fetch_uses_downloader_and_saver(
-        self, fetcher, date, table, downloader_return_value):
-        fetcher.fetch(date=date, table=table)
-
-        fetcher.downloader.download.assert_called_once_with(date, table)
-        fetcher.saver.save.assert_called_once_with(downloader_return_value[0])
-
-    def test_fetch_raises_error_date_before_threshold(self, fetcher):
-        fetcher.fetch(date(1999, 12, 31), table='A')
-
-        assert not fetcher.downloader.download.called
-        assert not fetcher.saver.save.called
-
-    def test_download_raises_error_incorrect_table(self, fetcher):
-        fetcher.fetch(date(2015, 12, 31), table='Z')
-
-        assert not fetcher.downloader.download.called
-        assert not fetcher.saver.save.called
-
-    def test_find_date_to_fetch_no_last_entry(self, fetcher):
-        to_fetch = fetcher.find_date_to_fetch()
-
-        assert to_fetch == fetcher.THRESHOLD_DATE
-
-    def test_find_date_to_fetch_last_entry_exist(
-        self, fetcher, saved_test_table):
-        to_fetch = fetcher.find_date_to_fetch()
-
-        assert to_fetch == saved_test_table.date + timedelta(days=1)
-
-    def test_find_date_to_fetch_last_entry_friday(
-        self, fetcher, saved_test_table):
-        saved_test_table.date = date(2016, 11, 4)
-        saved_test_table.save()
-        to_fetch = fetcher.find_date_to_fetch()
-
-        assert to_fetch == saved_test_table.date + timedelta(days=3)
-
-    def test_find_date_to_fetch_last_entry_younger_than_a_day(
-        self, fetcher, saved_test_table):
-        saved_test_table.date = date.today()
-        saved_test_table.save()
-        to_fetch = fetcher.find_date_to_fetch()
-
-        assert to_fetch is None

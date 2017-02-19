@@ -42,7 +42,7 @@ def table(db):
 @pytest.fixture
 def rate(db, currency, table):
     return Rate.objects.create(
-        currency=currency, rate=Decimal('1.2345'), table=table)
+        currency=currency, rate=Decimal('1.23'), table=table)
 
 
 @pytest.fixture

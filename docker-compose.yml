@@ -34,11 +34,24 @@ services:
       - db
       - rabbit
       - nginx
-  worker:
+  worker_rates:
     build: .
     restart: always
-    container_name: exchange_rates_worker
-    command: ./run_celery.sh
+    container_name: exchange_rates_worker_rates
+    command: ./run_rates_worker.sh
+    volumes:
+      - .:/app
+    links:
+      - db
+      - rabbit
+  worker_notifications:
+    build: .
+    environment:
+      - NOTIFICATIONS_EMAIL_PASSWORD=$NOTIFICATIONS_EMAIL_PASSWORD
+      - NOTIFICATIONS_EMAIL_USER=$NOTIFICATIONS_EMAIL_USER
+    restart: always
+    container_name: exchange_rates_worker_notifiactions
+    command: ./run_notifications_worker.sh
     volumes:
       - .:/app
     links:
@@ -46,6 +59,9 @@ services:
       - rabbit
   shell:
     build: .
+    environment:
+      - NOTIFICATIONS_EMAIL_PASSWORD=$NOTIFICATIONS_EMAIL_PASSWORD
+      - NOTIFICATIONS_EMAIL_USER=$NOTIFICATIONS_EMAIL_USER
     restart: always
     container_name: exchange_rates_shell
     command: tail -f /dev/null

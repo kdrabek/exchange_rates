@@ -1,6 +1,9 @@
 from django.contrib.auth import authenticate
+from django.utils.six import BytesIO
+
 
 from rest_framework.views import APIView
+from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework import status
@@ -8,12 +11,17 @@ from rest_framework import status
 from authentication.models import User
 
 
+def get_json(request):
+    stream = BytesIO(request.body)
+    return JSONParser().parse(stream)
+
+
 class LoginView(APIView):
 
     def post(self, request):
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-
+        data = get_json(request)
+        email = data.get('email')
+        password = data.get('password')
         if not email or not password:
             return Response(
                 {'error': 'Password or email is missing'},
@@ -37,8 +45,9 @@ class LoginView(APIView):
 class RegisterView(APIView):
 
     def post(self, request):
-        email = request.POST.get('email')
-        password = request.POST.get('password')
+        data = get_json(request)
+        email = data.get('email')
+        password = data.get('password')
 
         if not email or not password:
             return Response(

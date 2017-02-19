@@ -1,17 +1,13 @@
+from datetime import datetime
+
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from rates.models import Currency
-from rates.serializers import CurrencySerializer
-
-
-class PingView(APIView):
-
-    def get(self, request, format=None):
-        return Response({'response': 'pong'}, status=status.HTTP_200_OK)
+from rates.models import Currency, Rate, Table
+from rates.serializers import CurrencySerializer, RatesSerializer
 
 
 class CurrencyView(APIView):
@@ -35,3 +31,28 @@ class CurrencyView(APIView):
         if code is not None:
             queryset = queryset.filter(code=code.upper())
         return queryset
+
+
+class RatesView(APIView):
+
+    def get(self, request, date=None, format=None):
+        table = self._get_table(date)
+        queryset = Rate.objects.filter(table=table)
+        serializer = RatesSerializer(queryset, many=True)
+
+        return Response(
+            {'table_date': table.date, 'rates': serializer.data},
+            status=status.HTTP_200_OK,
+        )
+
+    def _get_table(self, date):
+        if not date:
+            return Table.objects.latest('date')
+        else:
+            requested_date = datetime.strptime(date, '%Y-%m-%d').date()
+            return (
+                Table.objects
+                .filter(date__lte=requested_date)
+                .order_by('-date')
+                .first()
+            )

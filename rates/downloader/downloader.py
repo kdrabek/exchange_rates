@@ -1,4 +1,4 @@
-from datetime import datetime, date, timedelta
+from datetime import datetime
 from decimal import Decimal
 import logging
 
@@ -13,20 +13,31 @@ log = logging.getLogger(__name__)
 class RatesDownloader(object):
 
     BASE_URL = 'http://api.nbp.pl/api/exchangerates/tables/{table}/{date}'
+    ALLOWED_TABLES = ['A', 'B', 'C']
+
+    def __init__(self, threshold_date):
+        self.saver = RatesSaver()
+        self.threshold_date = threshold_date
 
     def download(self, date, table):
-        log.info(
-            'Fetching rates for date: {0} table: {1} '.format(date, table)
-        )
+        if not self._is_valid_request(date, table):
+            return
+
+        log.info('Downloading for date: {0} table: {1} '.format(date, table))
         url = self._prepare_url(date, table)
         response = requests.get(url)
         response.raise_for_status()
-
         return response.json()
 
     def _prepare_url(self, date, table):
         formatted_date = datetime.strftime(date, "%Y-%m-%d")
         return self.BASE_URL.format(table=table, date=formatted_date)
+
+    def _is_valid_request(self, date, table):
+        if not self.threshold_date <= date <= date.today():
+            return False
+
+        return table in self.ALLOWED_TABLES
 
 
 class RatesSaver(object):
@@ -51,7 +62,7 @@ class RatesSaver(object):
             )
 
     def _save_rate(self, rate, currency, table):
-        new_rate = Rate.objects.create(
+        Rate.objects.create(
             currency=currency,
             table=table,
             rate=Decimal(rate['mid'])
@@ -66,49 +77,3 @@ class RatesSaver(object):
                 name=rate.get('currency') or rate.get('country'),
                 table_type=table_type
             )
-
-
-class RatesFetcher(object):
-
-    DEFAULT_TABLE = 'A'
-    ALLOWED_TABLES = ['A', 'B', 'C']
-    THRESHOLD_DATE = date(2010, 1, 1)
-    ONE_DAY = timedelta(days=1)
-
-    def __init__(self):
-        self.downloader = RatesDownloader()
-        self.saver = RatesSaver()
-
-    def find_date_to_fetch(self):
-        try:
-            last_entry = Table.objects.latest('date')
-        except Table.DoesNotExist:
-            return self.THRESHOLD_DATE
-
-        if last_entry.date + self.ONE_DAY >= date.today():
-            return None
-        return self._next_workday(last_entry)
-
-    def _next_workday(self, last_entry):
-        next_day = last_entry.date + self.ONE_DAY
-
-        while next_day.weekday() > 4:  # 4 = Friday
-            next_day += self.ONE_DAY
-
-        return next_day
-
-    def fetch(self, date, table=DEFAULT_TABLE):
-        if not self.is_valid_request(date, table):
-            return
-
-        raw_data = self.downloader.download(date, table)
-        for rates_information in raw_data:
-            self.saver.save(rates_information)
-
-    def is_valid_request(self, date, table):
-        if date < self.THRESHOLD_DATE:
-            return False
-        if table not in self.ALLOWED_TABLES:
-            return False
-
-        return True

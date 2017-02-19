@@ -4,6 +4,8 @@ ADD requirements_dev.txt /app/requirements_dev.txt
 
 WORKDIR /app/
 
+RUN rm -rf celerybeat-schedule
+
 RUN pip install -r requirements.txt
 RUN pip install -r requirements_dev.txt
 RUN adduser --disabled-password --gecos "" exchange
