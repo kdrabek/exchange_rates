@@ -19,7 +19,7 @@ class TestRatesDownloader(object):
     @pytest.fixture
     @freezegun.freeze_time('2017-02-10 20:00:00')
     def downloader(self):
-        return RatesDownloader(threshold_date=date.today()-timedelta(days=90))
+        return RatesDownloader()
 
     def assert_rate_dict_is_correct(self, rates_dict):
         single_rate_dict = rates_dict['rates'][0]
@@ -35,25 +35,11 @@ class TestRatesDownloader(object):
     @use_cassette(os.path.join(HERE, 'cassettes/tableA.yml'))
     @freezegun.freeze_time('2016-11-07 20:00:00')  # changing will change vcr
     def test_download(self, downloader):
-        with mock.patch.object(downloader, '_is_valid_request') as m:
-            m.return_value = True
-            response = downloader.download(date=date.today(), table='A')
+        response = downloader.download(date=date.today(), table='A')
         rates_dict = response[0]
 
         assert isinstance(response, list)
         self.assert_rate_dict_is_correct(rates_dict)
-
-    def test_download_when_date_in_the_future(self, downloader):
-        future_date = date.today() + timedelta(days=4)
-        response = downloader.download(date=future_date, table='A')
-
-        assert response is None
-
-    def test_download_when_date_before_threshold(self, downloader):
-        before_threshold_date = date.today() - timedelta(days=91)
-        response = downloader.download(date=before_threshold_date, table='A')
-
-        assert response is None
 
     @mock.patch('rates.downloader.downloader.requests')
     def test_fetch_get_uses_correct_url(self, mock_requests, downloader):
@@ -85,12 +71,12 @@ class TestRatesSaver(object):
         }
 
     def test_save(self, saver, raw_data):
-        assert len(Table.objects.all()) == 0
-        assert len(Rate.objects.all()) == 0
-        assert len(Currency.objects.all()) == 0
+        assert Table.objects.count() == 0
+        assert Rate.objects.count() == 0
+        assert Currency.objects.count() == 0
 
         saver.save(raw_data)
 
-        assert len(Rate.objects.all()) == 1
-        assert len(Table.objects.all()) == 1
-        assert len(Currency.objects.all()) == 1
+        assert Rate.objects.count() == 1
+        assert Table.objects.count() == 1
+        assert Currency.objects.count() == 1
