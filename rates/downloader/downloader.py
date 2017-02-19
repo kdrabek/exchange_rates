@@ -13,31 +13,19 @@ log = logging.getLogger(__name__)
 class RatesDownloader(object):
 
     BASE_URL = 'http://api.nbp.pl/api/exchangerates/tables/{table}/{date}'
-    ALLOWED_TABLES = ['A', 'B', 'C']
-
-    def __init__(self, threshold_date):
-        self.saver = RatesSaver()
-        self.threshold_date = threshold_date
 
     def download(self, date, table):
-        if not self._is_valid_request(date, table):
-            return
-
         log.info('Downloading for date: {0} table: {1} '.format(date, table))
         url = self._prepare_url(date, table)
         response = requests.get(url)
         response.raise_for_status()
+
         return response.json()
 
     def _prepare_url(self, date, table):
         formatted_date = datetime.strftime(date, "%Y-%m-%d")
         return self.BASE_URL.format(table=table, date=formatted_date)
 
-    def _is_valid_request(self, date, table):
-        if not self.threshold_date <= date <= date.today():
-            return False
-
-        return table in self.ALLOWED_TABLES
 
 
 class RatesSaver(object):
