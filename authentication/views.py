@@ -22,7 +22,6 @@ class LoginView(APIView):
         data = get_json(request)
         email = data.get('email')
         password = data.get('password')
-
         if not email or not password:
             return Response(
                 {'error': 'Password or email is missing'},

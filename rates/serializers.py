@@ -21,5 +21,5 @@ class RatesSerializer(serializers.Serializer):
     name = serializers.ReadOnlyField(source='currency.name')
 
     rate = serializers.DecimalField(
-        required=True, decimal_places=2, max_digits=6
+        required=True, decimal_places=4, max_digits=6
     )

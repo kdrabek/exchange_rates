@@ -4,7 +4,6 @@ from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.renderers import JSONRenderer
 from rest_framework.views import APIView
 
 from rates.models import Currency, Rate, Table
@@ -42,11 +41,8 @@ class RatesView(APIView):
         serializer = RatesSerializer(queryset, many=True)
 
         return Response(
-            JSONRenderer().render({
-                'table_date': table.date,
-                'rates': serializer.data
-            }),
-            status=status.HTTP_200_OK
+            {'table_date': table.date, 'rates': serializer.data},
+            status=status.HTTP_200_OK,
         )
 
     def _get_table(self, date):

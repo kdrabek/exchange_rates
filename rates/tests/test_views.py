@@ -1,5 +1,3 @@
-import json
-
 from decimal import Decimal
 from datetime import date, datetime, timedelta
 import pytest
@@ -105,13 +103,13 @@ class TestRatesView(object):
         return datetime.strftime(today, '%Y-%m-%d')
 
     def assert_response(self, response, expected_date):
-        data = json.loads(response.json())
+        json = response.json()
         assert response.status_code == HTTP_200_OK
-        assert data['table_date'] == expected_date
-        assert data['rates'][0] == {
+        assert json['table_date'] == expected_date
+        assert json['rates'][0] == {
             'currency':'ABC',
             'name':'Currency',
-            'rate':'12.34'
+            'rate':'12.3400'
         }
 
     def test_get_latest_rates(self, client, saved_rate, today):
