@@ -19,12 +19,13 @@ class TestCurrencySerializer:
             'currency': notification.currency.code,
             'rate': notification.rate,
             'threshold': notification.threshold,
+            'is_active': notification.is_active
         }
 
     def test_notification_object_is_created(self, serializer, currency, user):
         data = {
             'user': user.id, 'currency': currency.code,
-            'rate': '12.34', 'threshold': 'BELOW'
+            'rate': '12.34', 'threshold': 'BELOW', 'is_active': True
         }
 
         serializer_with_data = serializer(data=data)
@@ -41,7 +42,7 @@ class TestCurrencySerializer:
 
         data = {
             'user': user.id, 'currency': currency.code,
-            'rate': '99.88', 'threshold': 'BELOW'
+            'rate': '99.88', 'threshold': 'BELOW', 'is_active': False
         }
 
         serializer_with_data = serializer(instance=notification, data=data)
@@ -55,3 +56,4 @@ class TestCurrencySerializer:
         assert updated_notification is not None
         assert updated_notification.rate == Decimal('99.88')
         assert updated_notification.threshold == 'BELOW'
+        assert updated_notification.is_active is False

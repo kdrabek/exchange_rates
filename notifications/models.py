@@ -15,3 +15,5 @@ class Notification(models.Model):
     currency = models.ForeignKey('rates.Currency')
     rate = models.DecimalField(max_digits=6, decimal_places=2)
     threshold = models.CharField(max_length=5, choices=THRESHOLD_CHOICES)
+    is_active = models.BooleanField(default=True)
+    last_sent = models.DateTimeField(null=True)
