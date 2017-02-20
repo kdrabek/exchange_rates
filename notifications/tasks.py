@@ -46,7 +46,6 @@ def _should_send(last_rate, notification):
         notification.last_sent else True
     )
     condition_met = operator(last_rate.rate, notification.rate)
-
     return all([old_enough, condition_met, notification.is_active])
 
 
