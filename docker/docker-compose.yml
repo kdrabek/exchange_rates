@@ -2,21 +2,14 @@ version: "2"
 services:
   db:
     restart: always
-    image: postgres:9.4
+    image: postgres:9.5
     container_name: exchange_rates_postgres
     hostname: db
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=postgres
   rabbit:
     restart: always
     hostname: rabbit
     container_name: exchange_rates_rabbit
     image: rabbitmq:3.6-management
-    environment:
-      - RABBITMQ_DEFAULT_USER=exchange
-      - RABBITMQ_DEFAULT_PASS=Zasada123456789
     ports:
       - "5672"
       - "15672"
@@ -25,9 +18,11 @@ services:
     build: .
     container_name: exchange_rates_web
     hostname: web
-    command: ./run_web.sh
+    command: ./docker/run_web.sh
+    env_file:
+      - ./local.env
     volumes:
-      - .:/app
+      - ..:/app
     expose:
       - "8000"
     links:
@@ -38,35 +33,35 @@ services:
     build: .
     restart: always
     container_name: exchange_rates_worker_rates
-    command: ./run_rates_worker.sh
+    command: ./docker/run_rates_worker.sh
+    env_file:
+      - ./local.env
     volumes:
-      - .:/app
+      - ..:/app
     links:
       - db
       - rabbit
   worker_notifications:
     build: .
-    environment:
-      - NOTIFICATIONS_EMAIL_PASSWORD=$NOTIFICATIONS_EMAIL_PASSWORD
-      - NOTIFICATIONS_EMAIL_USER=$NOTIFICATIONS_EMAIL_USER
+    env_file:
+      - ./local.env
     restart: always
     container_name: exchange_rates_worker_notifiactions
-    command: ./run_notifications_worker.sh
+    command: ./docker/run_notifications_worker.sh
     volumes:
-      - .:/app
+      - ..:/app
     links:
       - db
       - rabbit
   shell:
     build: .
-    environment:
-      - NOTIFICATIONS_EMAIL_PASSWORD=$NOTIFICATIONS_EMAIL_PASSWORD
-      - NOTIFICATIONS_EMAIL_USER=$NOTIFICATIONS_EMAIL_USER
+    env_file:
+      - ./local.env
     restart: always
     container_name: exchange_rates_shell
     command: tail -f /dev/null
     volumes:
-      - .:/app
+      - ..:/app
     links:
       - db
       - rabbit
@@ -76,4 +71,4 @@ services:
     ports:
       - "80:80"
     volumes:
-      - .:/app
+      - ..:/app

@@ -10,8 +10,16 @@ services:
 install:
   - sudo pip install docker-compose
 
+before_script:
+  - env
+  - env > ./docker/local.env
+
 script:
+  - cd docker
   - docker-compose build
   - docker-compose up -d shell
+  - docker ps
   - sleep 30
+  - docker logs exchange_rates_postgres
+  - docker ps
   - docker-compose exec shell bash -c "py.test"
