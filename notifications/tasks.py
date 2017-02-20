@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+from django.utils import timezone
 from operator import gt, lt
 
 from django.conf import settings
@@ -28,16 +30,33 @@ def send_notification_email(notification_id):
     notification = Notification.objects.get(id=notification_id)
     last_rate = Rate.objects.filter(currency=notification.currency).order_by(
         'table__date').last()
+
+    if _should_send(last_rate, notification):
+        _send_email(notification, last_rate)
+        notification.last_sent = datetime.utcnow()
+        notification.save()
+
+
+def _should_send(last_rate, notification):
+    now = timezone.now()
     operator = get_operator(notification.threshold)
-    if operator(last_rate.rate, notification.rate):
-        html_message = render_to_string(
+
+    old_enough = (
+        now - notification.last_sent > timedelta(hours=12) if
+        notification.last_sent else True
+    )
+    condition_met = operator(last_rate.rate, notification.rate)
+
+    return all([old_enough, condition_met, notification.is_active])
+
+
+def _send_email(notification, last_rate):
+    send_mail(
+        subject='Notification',
+        message='A text message',
+        recipient_list=[notification.user.email],
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        html_message=render_to_string(
             'mail.html', {'notification': notification, 'rate': last_rate}
         )
-
-        send_mail(
-            subject='Notification',
-            message='A text message',
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[notification.user.email],
-            html_message=html_message
-        )
+    )

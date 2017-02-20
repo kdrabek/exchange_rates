@@ -13,7 +13,12 @@ class TestNotificationsListView(object):
 
     @pytest.fixture
     def post_data(self):
-        return {'code': 'AUD', 'rate': '23.45', 'threshold': 'ABOVE'}
+        return {
+            'code': 'AUD',
+            'rate': '23.45',
+            'threshold': 'ABOVE',
+            'is_active': True
+        }
 
     def assert_response(self, response, expected_len, expected_keys):
         data = response.json()
@@ -50,7 +55,9 @@ class TestNotificationsListView(object):
 
         self.assert_response(
             response, expected_len=1,
-            expected_keys=['id', 'currency', 'rate', 'threshold', 'user']
+            expected_keys=[
+                'id', 'currency', 'rate', 'threshold', 'user', 'is_active'
+            ]
         )
 
     def test_authenticated_user_can_create_new_notification(
@@ -97,7 +104,12 @@ class TestNotificationsDetailView(object):
 
     @pytest.fixture
     def put_data(self):
-        return {'code': 'AUD', 'rate': '23.45', 'threshold': 'BELOW'}
+        return {
+            'code': 'AUD',
+            'rate': '23.45',
+            'threshold': 'BELOW',
+            'is_active': False
+        }
 
     def test_get_unauthenticated_user(self, client, user, token):
         response = client.get(
@@ -119,7 +131,9 @@ class TestNotificationsDetailView(object):
         )
 
         data = response.json()
-        expected_keys = ['id', 'currency', 'rate', 'threshold', 'user']
+        expected_keys = [
+            'id', 'currency', 'rate', 'threshold', 'user', 'is_active'
+        ]
 
         assert response.status_code == status.HTTP_200_OK
         assert isinstance(data, dict)
@@ -143,6 +157,7 @@ class TestNotificationsDetailView(object):
         assert notification.threshold == 'ABOVE'
         assert str(updated_notification.rate) == put_data['rate']
         assert updated_notification.threshold == put_data['threshold']
+        assert updated_notification.is_active is put_data['is_active']
 
     def test_delete_single_notification(
             self, client, user, token, notification):
