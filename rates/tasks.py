@@ -41,7 +41,7 @@ def find_rates_to_fetch():
     to_download = list(coordinator.find_dates_to_download())
 
     for date_to_download in reversed(to_download):
-        logger.warning("Publishing with date: %s", to_download)
+        logger.warning("Publishing with date: %s", date_to_download)
         download_rates.delay(
             date_to_download=date_to_download,
             table=coordinator.TABLE

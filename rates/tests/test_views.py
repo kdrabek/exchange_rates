@@ -172,7 +172,8 @@ class TestRatesDetailsView(Fixtures):
             'currency': saved_rate.currency.code,
             'date': str(saved_rate.table.date),
             'name': saved_rate.currency.name,
-            'rate': '{0:.4f}'.format(saved_rate.rate)
+            'rate': '{0:.4f}'.format(saved_rate.rate),
+            'relative_change': '0.0000'
         }
 
     def test_get_rates_details_404_for_non_existing_currency_code(

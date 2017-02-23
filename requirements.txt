@@ -1,8 +1,8 @@
 Django==1.9.8
-djangorestframework
-gunicorn
-celery
+djangorestframework==3.5.4
+gunicorn==19.6.0
+celery==4.0.2
 psycopg2==2.5.3
-requests
-redis==2.10.5
-django-cors-headers
+requests==2.13.0
+django-cors-headers==2.0.2
+simplejson==3.10.0
