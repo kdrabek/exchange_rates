@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.db import models
 
 
@@ -13,16 +14,27 @@ class Currency(models.Model):
 
 class Rate(models.Model):
 
+    class Meta:
+        unique_together = ("currency", "table")
+
     currency = models.ForeignKey('Currency')
     rate = models.DecimalField(max_digits=6, decimal_places=4)
     table = models.ForeignKey('Table')
 
-    class Meta:
-        unique_together = ("currency", "table")
-
     def __repr__(self):
         return '<Rate currency: {0} table: {1}>'.format(
             self.currency.code, self.table.id)
+
+    @property
+    def relative_change(self):
+        try:
+            previous_table = self.table.get_previous_by_date()
+            previous = Rate.objects.filter(
+                table=previous_table, currency=self.currency).first()
+        except (IndexError, Table.DoesNotExist, Rate.DoesNotExist):
+            return Decimal('0.00')
+        else:
+            return self.rate - previous.rate
 
 
 class Table(models.Model):

@@ -50,3 +50,4 @@ def test_creates_valid_rate_model(db, currency, table, rate_value):
     assert rate.currency == currency
     assert rate.table == table
     assert rate.rate == rate_value
+    assert rate.relative_change == Decimal('0.00')
