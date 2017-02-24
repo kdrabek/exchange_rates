@@ -15,7 +15,9 @@ services:
       - "15672"
   web:
     restart: always
-    build: .
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
     container_name: exchange_rates_web
     hostname: web
     command: ./docker/run_web.sh
@@ -30,7 +32,9 @@ services:
       - rabbit
       - nginx
   worker_rates:
-    build: .
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
     restart: always
     container_name: exchange_rates_worker_rates
     command: ./docker/run_rates_worker.sh
@@ -42,7 +46,9 @@ services:
       - db
       - rabbit
   worker_notifications:
-    build: .
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
     env_file:
       - ./local.env
     restart: always
@@ -54,7 +60,9 @@ services:
       - db
       - rabbit
   shell:
-    build: .
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
     env_file:
       - ./local.env
     restart: always
