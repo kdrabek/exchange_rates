@@ -10,6 +10,8 @@ services:
     hostname: rabbit
     container_name: exchange_rates_rabbit
     image: rabbitmq:3.6-management
+    env_file:
+      - ./local.env
     ports:
       - "5672"
       - "15672"
@@ -75,6 +77,7 @@ services:
       - rabbit
   nginx:
     restart: always
+    container_name: exchange_rates_nginx
     build: ./nginx/
     ports:
       - "80:80"

@@ -103,7 +103,7 @@ BROKER_URL = os.environ.get('BROKER_URL', None)
 if not BROKER_URL:
     BROKER_URL = 'amqp://{user}:{password}@{hostname}/{vhost}/'.format(
         user=os.environ.get('RABBITMQ_DEFAULT_USER'),
-        password=os.environ.get('RABBITMQ_DEFAULT_PASSWORD'),
+        password=os.environ.get('RABBITMQ_DEFAULT_PASS'),
         hostname=RABBIT_HOSTNAME,
         vhost=os.environ.get('RABBIT_ENV_VHOST', ''))
 
