@@ -10,7 +10,11 @@ services:
 install:
   - sudo pip install docker-compose
 
+before_script:
+  - env > ./docker/local.env
+
 script:
+  - cd docker
   - docker-compose build
   - docker-compose up -d shell
   - sleep 30

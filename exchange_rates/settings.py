@@ -89,9 +89,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
          'ENGINE': 'django.db.backends.postgresql',
-         'NAME': 'postgres',
-         'USER': 'postgres',
-         'PASSWORD': 'postgres',
+         'NAME': os.environ.get("APP_POSTGRES_NAME"),
+         'USER': os.environ.get("APP_POSTGRES_USER"),
+         'PASSWORD': os.environ.get("APP_POSTGRES_PASSWORD", ''),
          'HOST': 'db',
          'PORT': 5432,
     }
@@ -102,8 +102,8 @@ BROKER_URL = os.environ.get('BROKER_URL', None)
 
 if not BROKER_URL:
     BROKER_URL = 'amqp://{user}:{password}@{hostname}/{vhost}/'.format(
-        user=os.environ.get('RABBITMQ_DEFAULT_USER', 'exchange'),
-        password=os.environ.get('RABBITMQ_DEFAULT_PASSWORD', 'Zasada123456789'),
+        user=os.environ.get('RABBITMQ_DEFAULT_USER'),
+        password=os.environ.get('RABBITMQ_DEFAULT_PASS'),
         hostname=RABBIT_HOSTNAME,
         vhost=os.environ.get('RABBIT_ENV_VHOST', ''))
 
