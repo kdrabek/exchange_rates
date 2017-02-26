@@ -8,6 +8,7 @@ from rest_framework.status import (
 )
 
 from rates.models import Currency, Rate, Table
+from rates.utils import CODE_TO_COUNTRY
 from authentication.models import User
 
 
@@ -76,7 +77,7 @@ class TestCurrencyView(Fixtures):
 
         self.assert_response(
             response, expected_len=2,
-            expected_keys=['code', 'name', 'table_type']
+            expected_keys=['code', 'name', 'table_type', 'country']
         )
 
     @pytest.mark.parametrize('code, results_count', [('ABC', 1), ('CDE', 0)])
@@ -90,7 +91,7 @@ class TestCurrencyView(Fixtures):
 
         self.assert_response(
             response, expected_len=results_count,
-            expected_keys=['code', 'name', 'table_type']
+            expected_keys=['code', 'name', 'table_type', 'country']
         )
 
 
@@ -107,27 +108,28 @@ class TestRatesView(Fixtures):
         today = datetime.today() + timedelta(days=1)
         return datetime.strftime(today, '%Y-%m-%d')
 
-    def assert_response(self, response, expected_date):
+    def assert_response(self, response, expected_date, rate):
         json = response.json()
         assert response.status_code == HTTP_200_OK
         assert json['table_date'] == expected_date
         assert json['rates'][0] == {
             'currency':'ABC',
             'name':'Currency',
-            'rate':'12.3400'
+            'rate':'12.3400',
+            'country': CODE_TO_COUNTRY.get(rate.currency.code, 'unknown')
         }
 
     def test_get_latest_rates(self, client, saved_rate, today):
         response = client.get(
             reverse('rates:rates_latest'),
         )
-        self.assert_response(response, today)
+        self.assert_response(response, today, saved_rate)
 
     def test_get_rates_for_given_date(self, client, saved_rate, today):
         response = client.get(
             reverse('rates:rates_for_date', kwargs={'date': today})
         )
-        self.assert_response(response, today)
+        self.assert_response(response, today, saved_rate)
 
     def test_get_rates_for_given_date_returns_date_closest_date(
             self, client, saved_rate, tomorrow, today):
@@ -135,7 +137,7 @@ class TestRatesView(Fixtures):
             reverse('rates:rates_for_date', kwargs={'date': tomorrow}),
         )
         # because we don't have future rates, today's are fetched
-        self.assert_response(response, expected_date=today)
+        self.assert_response(response, today, saved_rate)
 
 
 @pytest.mark.django_db
@@ -173,7 +175,8 @@ class TestRatesDetailsView(Fixtures):
             'date': str(saved_rate.table.date),
             'name': saved_rate.currency.name,
             'rate': '{0:.4f}'.format(saved_rate.rate),
-            'relative_change': '0.0000'
+            'relative_change': '0.0000',
+            'country': CODE_TO_COUNTRY.get(saved_rate.currency.code, 'unknown')
         }
 
     def test_get_rates_details_404_for_non_existing_currency_code(

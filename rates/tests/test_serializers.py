@@ -6,11 +6,12 @@ from rates.models import Currency, Rate, Table
 from rates.serializers import (
     CurrencySerializer, RatesSerializer, RateDetailsSerializer
 )
+from rates.utils import CODE_TO_COUNTRY
 
 
 @pytest.fixture
 def currency(db):
-    return Currency(code='ABC', name='Test Currency', table_type='A')
+    return Currency(code='GBP', name='Test Currency', table_type='A')
 
 
 @pytest.fixture
@@ -29,14 +30,16 @@ class TestCurrencySerializer(object):
 
     def test_currency_object_is_serialized(self, serializer, currency):
         assert serializer(currency).data == {
-            'code': 'ABC', 'name': 'Test Currency', 'table_type': 'A'
+            'code': 'GBP', 'name': 'Test Currency', 'table_type': 'A',
+            'country': CODE_TO_COUNTRY.get(currency.code)
         }
 
     def test_currency_objects_with_missing_attribute(self, serializer):
-        currency = Currency(code='ABC', name='Test Currency')
+        currency = Currency(code='GBP', name='Test Currency')
 
         assert serializer(currency).data == {
-            'code': 'ABC', 'name': 'Test Currency', 'table_type': ''
+            'code': 'GBP', 'name': 'Test Currency', 'table_type': '',
+            'country': CODE_TO_COUNTRY.get(currency.code)
         }
 
 
@@ -50,7 +53,8 @@ class TestRatesSerializer(object):
         rate = Rate(currency=currency, rate=Decimal('12.34'))
 
         assert serializer(rate).data == {
-            'currency': 'ABC', 'rate': '12.3400', 'name': 'Test Currency'
+            'currency': 'GBP', 'rate': '12.3400', 'name': 'Test Currency',
+            'country': CODE_TO_COUNTRY[currency.code]
         }
 
 
@@ -70,5 +74,6 @@ class TestRateDetailsSerializer(object):
             'rate': '{0:.4f}'.format(rate.rate),
             'name': currency.name,
             'date': table.date,
-            'relative_change': '0.0000'
+            'relative_change': '0.0000',
+            'country': CODE_TO_COUNTRY[currency.code]
         }
