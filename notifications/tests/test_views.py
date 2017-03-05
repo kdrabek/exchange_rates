@@ -23,12 +23,13 @@ class TestNotificationsListView(object):
     def assert_response(self, response, expected_len, expected_keys):
         data = response.json()
         assert response.status_code == status.HTTP_200_OK
-        assert isinstance(data, list)
-        assert len(data) == expected_len
+        assert isinstance(data, dict)
+        assert len(data['notifications']) == expected_len
 
         if expected_len > 0:
-            assert isinstance(data[0], dict)
-            assert sorted(expected_keys) == sorted(data[0].keys())
+            assert isinstance(data['notifications'], list)
+            assert sorted(expected_keys) == sorted(
+                data['notifications'][0].keys())
 
     def test_unauthenticated_user_is_unauthorized(self, client, token):
         response = client.get(
@@ -137,7 +138,10 @@ class TestNotificationsDetailView(object):
 
         assert response.status_code == status.HTTP_200_OK
         assert isinstance(data, dict)
-        assert sorted(expected_keys) == sorted(data.keys())
+        print(data)
+        single_notification = data['notifications'][0]
+
+        assert sorted(expected_keys) == sorted(single_notification.keys())
 
     def test_put_single_notification(
             self, client, user, token, notification, put_data):

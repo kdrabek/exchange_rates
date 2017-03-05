@@ -41,7 +41,10 @@ class NotificationsListView(APIView):
         queryset = Notification.objects.filter(user=user)
         serializer = NotificationSerializer(queryset, many=True)
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(
+            {'notifications': serializer.data},
+            status=status.HTTP_200_OK
+        )
 
     def post(self, request, token):
         data = get_json(request)
@@ -68,7 +71,10 @@ class NotificationDetailView(APIView):
         notification = get_object_or_404(Notification, id=notification_id)
         serializer = NotificationSerializer(notification)
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(
+            {'notifications': [serializer.data]},
+            status=status.HTTP_200_OK
+        )
 
     def put(self, request, token, notification_id):
         user = get_by_token(token)
