@@ -6,9 +6,9 @@ from authentication.models import User
 class IsOwner(BasePermission):
 
     def has_permission(self, request, view):
-        user_id = view.kwargs['user_id']
+        token = view.kwargs['token']
         try:
-            user = User.objects.get(id=user_id)
+            user = User.objects.get(auth_token__key=token)
         except User.DoesNotExist:
             return False
 

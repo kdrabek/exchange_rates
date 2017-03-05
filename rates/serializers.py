@@ -9,6 +9,9 @@ class CurrencySerializer(serializers.Serializer):
     name = serializers.CharField(
         required=True, allow_blank=False, trim_whitespace=True
     )
+
+    country = serializers.ReadOnlyField()
+
     table_type = serializers.CharField(
         required=True, allow_blank=False, trim_whitespace=True
     )
@@ -17,6 +20,8 @@ class CurrencySerializer(serializers.Serializer):
 class RatesSerializer(serializers.Serializer):
 
     currency = serializers.ReadOnlyField(source='currency.code')
+
+    country = serializers.ReadOnlyField(source='currency.country')
 
     name = serializers.ReadOnlyField(source='currency.name')
 

@@ -1,3 +1,4 @@
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.utils.six import BytesIO
 
@@ -20,24 +21,36 @@ def get_json(request):
     return JSONParser().parse(stream)
 
 
+def get_by_token(token):
+    try:
+        user = User.objects.get(auth_token__key=token)
+    except User.DoesNotExist:
+        raise Http404('User associated with provided token does not exist')
+    else:
+        return user
+
+
 class NotificationsListView(APIView):
 
     authentication_classes = (TokenAuthentication, )
     permission_classes = (IsAuthenticated, IsOwner)
 
-    def get(self, request, user_id, format=None):
-        user = get_object_or_404(User, id=user_id)
+    def get(self, request, token, format=None):
+        user = get_by_token(token)
 
         queryset = Notification.objects.filter(user=user)
         serializer = NotificationSerializer(queryset, many=True)
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(
+            {'notifications': serializer.data},
+            status=status.HTTP_200_OK
+        )
 
-    def post(self, request, user_id):
+    def post(self, request, token):
         data = get_json(request)
-        user = get_object_or_404(User, id=user_id)
-        currency = get_object_or_404(Currency, code=data.get('code'))
+        user = get_by_token(token)
 
+        currency = get_object_or_404(Currency, code=data.get('code'))
         serializer = NotificationSerializer(data=data)
         if not serializer.is_valid():
             return Response(
@@ -53,15 +66,18 @@ class NotificationDetailView(APIView):
     authentication_classes = (TokenAuthentication, )
     permission_classes = (IsAuthenticated, IsOwner)
 
-    def get(self, request, user_id, notification_id):
-        user = get_object_or_404(User, id=user_id)
+    def get(self, request, token, notification_id):
+        user = get_by_token(token)
         notification = get_object_or_404(Notification, id=notification_id)
         serializer = NotificationSerializer(notification)
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(
+            {'notifications': [serializer.data]},
+            status=status.HTTP_200_OK
+        )
 
-    def put(self, request, user_id, notification_id):
-        user = get_object_or_404(User, id=user_id)
+    def put(self, request, token, notification_id):
+        user = get_by_token(token)
         notification = get_object_or_404(Notification, id=notification_id)
         data = get_json(request)
         serializer = NotificationSerializer(notification, data=data)
@@ -70,8 +86,8 @@ class NotificationDetailView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, user_id, notification_id):
-        user = get_object_or_404(User, id=user_id)
+    def delete(self, request, token, notification_id):
+        user = get_by_token(token)
         notification = get_object_or_404(Notification, id=notification_id)
         notification.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

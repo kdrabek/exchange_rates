@@ -4,6 +4,7 @@ from freezegun import freeze_time
 import pytest
 
 from rates.models import Currency, Rate, Table
+from rates.utils import CODE_TO_COUNTRY
 
 
 @pytest.fixture
@@ -28,6 +29,7 @@ def test_creates_valid_currency_model(db, test_currency):
     assert currency.code == test_currency['code']
     assert currency.name == test_currency['name']
     assert currency.table_type == test_currency['table_type']
+    assert currency.country == CODE_TO_COUNTRY.get(test_currency['code'])
 
 
 @freeze_time("2016-11-09 10:00:00")

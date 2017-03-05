@@ -1,6 +1,8 @@
 from decimal import Decimal
 from django.db import models
 
+from rates.utils import CODE_TO_COUNTRY
+
 
 class Currency(models.Model):
 
@@ -10,6 +12,10 @@ class Currency(models.Model):
 
     def __repr__(self):
         return '<Currency {0}>'.format(self.code)
+
+    @property
+    def country(self):
+        return CODE_TO_COUNTRY.get(self.code, 'unknown')
 
 
 class Rate(models.Model):

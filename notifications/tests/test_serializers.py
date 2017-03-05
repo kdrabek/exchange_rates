@@ -14,7 +14,7 @@ class TestCurrencySerializer:
 
     def test_notification_object_is_serialized(self, serializer, notification):
         assert serializer(notification).data == {
-            'user': notification.user.id,
+            'token': notification.user.auth_token.key,
             'id': notification.id,
             'currency': notification.currency.code,
             'rate': notification.rate,
