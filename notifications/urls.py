@@ -4,9 +4,9 @@ from notifications.views import NotificationsListView, NotificationDetailView
 
 
 urlpatterns = [
-    url(r'(?P<user_id>[0-9]+)/(?P<notification_id>[0-9]+)$',
+    url(r'(?P<token>[\w+]+)/(?P<notification_id>[0-9]+)$',
         NotificationDetailView.as_view(), name='detail'),
-    url(r'(?P<user_id>[0-9]+)$', NotificationsListView.as_view(), name='list'),
+    url(r'(?P<token>[\w+]+)$', NotificationsListView.as_view(), name='list'),
 
 ]
 

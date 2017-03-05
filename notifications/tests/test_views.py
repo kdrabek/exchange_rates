@@ -30,9 +30,9 @@ class TestNotificationsListView(object):
             assert isinstance(data[0], dict)
             assert sorted(expected_keys) == sorted(data[0].keys())
 
-    def test_unauthenticated_user_is_unauthorized(self, client, user):
+    def test_unauthenticated_user_is_unauthorized(self, client, token):
         response = client.get(
-            reverse('notifications:list', kwargs={'user_id': user.id})
+            reverse('notifications:list', kwargs={'token': token})
         )
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
@@ -40,7 +40,7 @@ class TestNotificationsListView(object):
     def test_authenticated_user_cannot_access_another_users_resource(
             self, client, user, token):
         response = client.get(
-            reverse('notifications:list', kwargs={'user_id': user.id + 1}),
+            reverse('notifications:list', kwargs={'token': token + '1'}),
             HTTP_AUTHORIZATION='Token {0}'.format(token)
         )
 
@@ -49,21 +49,21 @@ class TestNotificationsListView(object):
     def test_authenticated_user_can_get_notification_list(
             self, client, user, token, notification):
         response = client.get(
-            reverse('notifications:list', kwargs={'user_id': user.id}),
+            reverse('notifications:list', kwargs={'token': token}),
             HTTP_AUTHORIZATION='Token {0}'.format(token)
         )
 
         self.assert_response(
             response, expected_len=1,
             expected_keys=[
-                'id', 'currency', 'rate', 'threshold', 'user', 'is_active'
+                'id', 'currency', 'rate', 'threshold', 'token', 'is_active'
             ]
         )
 
     def test_authenticated_user_can_create_new_notification(
             self, client, user, token, currency, post_data):
         response = client.post(
-            reverse('notifications:list', kwargs={'user_id': user.id}),
+            reverse('notifications:list', kwargs={'token': token}),
             JSONRenderer().render(post_data),
             content_type="application/json",
             HTTP_AUTHORIZATION='Token {0}'.format(token)
@@ -76,7 +76,7 @@ class TestNotificationsListView(object):
             self, client, user, token, currency, post_data):
         post_data['code'] = 'XXX'
         response = client.post(
-            reverse('notifications:list', kwargs={'user_id': user.id}),
+            reverse('notifications:list', kwargs={'token': token}),
             JSONRenderer().render(post_data),
             content_type="application/json",
             HTTP_AUTHORIZATION='Token {0}'.format(token)
@@ -89,7 +89,7 @@ class TestNotificationsListView(object):
             self, client, user, token, currency, post_data):
         post_data['rate'] = '1.23456'  # to many decimal places
         response = client.post(
-            reverse('notifications:list', kwargs={'user_id': user.id}),
+            reverse('notifications:list', kwargs={'token': token}),
             JSONRenderer().render(post_data),
             content_type="application/json",
             HTTP_AUTHORIZATION='Token {0}'.format(token)
@@ -115,7 +115,7 @@ class TestNotificationsDetailView(object):
         response = client.get(
             reverse(
                 'notifications:detail',
-                kwargs={'user_id': user.id, 'notification_id': 1}
+                kwargs={'token': token, 'notification_id': 1}
             )
         )
 
@@ -125,14 +125,14 @@ class TestNotificationsDetailView(object):
         response = client.get(
             reverse(
                 'notifications:detail',
-                kwargs={'user_id': user.id, 'notification_id': notification.id}
+                kwargs={'token': token, 'notification_id': notification.id}
             ),
             HTTP_AUTHORIZATION='Token {0}'.format(token)
         )
 
         data = response.json()
         expected_keys = [
-            'id', 'currency', 'rate', 'threshold', 'user', 'is_active'
+            'id', 'currency', 'rate', 'threshold', 'token', 'is_active'
         ]
 
         assert response.status_code == status.HTTP_200_OK
@@ -144,7 +144,7 @@ class TestNotificationsDetailView(object):
         response = client.put(
             reverse(
                 'notifications:detail',
-                kwargs={'user_id': user.id, 'notification_id': notification.id}
+                kwargs={'token': token, 'notification_id': notification.id}
             ),
             JSONRenderer().render(put_data),
             content_type="application/json",
@@ -164,7 +164,7 @@ class TestNotificationsDetailView(object):
         response = client.delete(
             reverse(
                 'notifications:detail',
-                kwargs={'user_id': user.id, 'notification_id': notification.id}
+                kwargs={'token': token, 'notification_id': notification.id}
             ),
             HTTP_AUTHORIZATION='Token {0}'.format(token)
         )
