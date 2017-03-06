@@ -2,7 +2,7 @@ from datetime import datetime
 from decimal import Decimal
 import logging
 
-from django.core.exceptions import ValidationError
+from django.db import IntegrityError
 import requests
 
 from rates.models import Currency, Rate, Table
@@ -57,7 +57,7 @@ class RatesSaver(object):
                 table=table,
                 rate=Decimal(rate['mid'])
             )
-        except ValidationError as e:
+        except IntegrityError as e:
             log.error("Rates for %s for %s already exist.", currency, table)
 
     def _create_or_update_currency(self, rate, table_type):

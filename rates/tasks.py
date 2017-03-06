@@ -13,7 +13,7 @@ logger = get_task_logger(__name__)
 class RatesFetchingCoordinator(object):
 
     TABLE = 'A'
-    DAYS = 90
+    DAYS = 120
     THRESHOLD_DATE = date.today() - timedelta(days=DAYS)
 
     def get_days_after_threshold(self):

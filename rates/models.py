@@ -37,10 +37,11 @@ class Rate(models.Model):
             previous_table = self.table.get_previous_by_date()
             previous = Rate.objects.filter(
                 table=previous_table, currency=self.currency).first()
-        except (IndexError, Table.DoesNotExist, Rate.DoesNotExist):
+            previous_rate = previous.rate
+        except (IndexError, Table.DoesNotExist, Rate.DoesNotExist, AttributeError):
             return Decimal('0.00')
         else:
-            return self.rate - previous.rate
+            return self.rate - previous_rate
 
 
 class Table(models.Model):
