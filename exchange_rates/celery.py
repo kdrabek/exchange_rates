@@ -17,12 +17,12 @@ app.conf.task_routes = {
 app.conf.beat_schedule = {
     'fetch_rates': {
         'task': 'rates.tasks.find_rates_to_fetch',
-        'schedule': 6000000.0,
+        'schedule': 14400.0,
         'args': ()
     },
     'send_notifications': {
         'task': 'notifications.tasks.process_user_notifications',
-        'schedule': 360000.0,
+        'schedule': 14400.0,
         'args': ()
     },
 }
