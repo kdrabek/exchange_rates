@@ -9,7 +9,8 @@ from django.conf import settings
 from django.template.loader import render_to_string
 
 from notifications.tasks import (
-    send_notification_email, get_operator, process_user_notifications
+    send_notification_email, get_operator, process_users,
+    process_notifications
 )
 
 
@@ -20,10 +21,18 @@ def test_get_operator(threshold, expected_operator):
     assert get_operator(threshold) is expected_operator
 
 
+@mock.patch('notifications.tasks.process_notifications')
+def test_process_users_task(
+        mock_process_notifications, user, notification):
+    process_users()
+
+    mock_process_notifications.delay.assert_called_once_with(user_id=user.id)
+
+
 @mock.patch('notifications.tasks.send_notification_email')
 def test_process_user_notifications_task(
         mock_send_notification_email, user, notification):
-    process_user_notifications()
+    process_notifications(user.id)
 
     mock_send_notification_email.assert_called_once_with(notification.id)
 

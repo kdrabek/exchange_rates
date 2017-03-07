@@ -57,12 +57,14 @@ class TestCurrencyView(Fixtures):
     def assert_response(self, response, expected_len, expected_keys):
         data = response.json()
         assert response.status_code == HTTP_200_OK
-        assert isinstance(data, list)
-        assert len(data) == expected_len
+        assert isinstance(data, dict)
+        assert isinstance(data['currencies'], list)
+        assert len(data['currencies']) == expected_len
 
         if expected_len > 0:
-            assert isinstance(data[0], dict)
-            assert sorted(expected_keys) == sorted(data[0].keys())
+            assert isinstance(data['currencies'][0], dict)
+            assert sorted(expected_keys) == sorted(
+                data['currencies'][0].keys())
 
     def test_unauthenticated_user_is_unauthorized(self, client):
         response = client.get(reverse('rates:currency'))

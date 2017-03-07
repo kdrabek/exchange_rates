@@ -138,7 +138,6 @@ class TestNotificationsDetailView(object):
 
         assert response.status_code == status.HTTP_200_OK
         assert isinstance(data, dict)
-        print(data)
         single_notification = data['notifications'][0]
 
         assert sorted(expected_keys) == sorted(single_notification.keys())

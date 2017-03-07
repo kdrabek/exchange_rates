@@ -23,7 +23,10 @@ class CurrencyView(APIView):
         queryset = self._append_query_filters(queryset, request.query_params)
         serializer = CurrencySerializer(queryset, many=True)
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(
+            {'currencies': serializer.data},
+            status=status.HTTP_200_OK
+        )
 
     def _append_query_filters(self, queryset, query_params):
         queryset = self._append_code_filter(queryset, query_params)
