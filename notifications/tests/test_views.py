@@ -70,8 +70,10 @@ class TestNotificationsListView(object):
             HTTP_AUTHORIZATION='Token {0}'.format(token)
         )
 
+        notifications_for_user = Notification.objects.filter(user=user)
         assert response.status_code == status.HTTP_200_OK
-        assert Notification.objects.filter(user=user).count() == 1
+        assert response.json() == {'id': notifications_for_user.first().id}
+        assert notifications_for_user.count() == 1
 
     def test_404_raised_when_invalid_currency(
             self, client, user, token, currency, post_data):
