@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 from operator import gt, lt
 
+from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
@@ -12,6 +13,9 @@ from notifications.models import Notification
 from rates.models import Rate
 
 
+logger = get_task_logger(__name__)
+
+
 def get_operator(threshold):
     if threshold == 'ABOVE':
         return gt
@@ -20,10 +24,20 @@ def get_operator(threshold):
 
 
 @app.task
-def process_user_notifications():
+def process_users():
     for user in User.objects.all():
+        logger.warning("Publishing process_notifications for user: %s", user.id)
+        process_notifications.delay(user_id=user.id)
+
+
+@app.task
+def process_notifications(user_id):
+    try:
+        user = User.objects.get(pk=user_id)
         for notification in Notification.objects.filter(user=user):
             send_notification_email(notification.id)
+    except Exception as e:
+        logger.error("Exception occurred: %s", str(e))
 
 
 def send_notification_email(notification_id):

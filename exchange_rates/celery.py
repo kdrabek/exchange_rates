@@ -21,7 +21,7 @@ app.conf.beat_schedule = {
         'args': ()
     },
     'send_notifications': {
-        'task': 'notifications.tasks.process_user_notifications',
+        'task': 'notifications.tasks.process_users',
         'schedule': 14400.0,
         'args': ()
     },
