@@ -57,7 +57,7 @@ class TestNotificationsListView(object):
         self.assert_response(
             response, expected_len=1,
             expected_keys=[
-                'id', 'currency', 'rate', 'threshold', 'token', 'is_active'
+                'id', 'currency', 'rate', 'threshold', 'is_active'
             ]
         )
 
@@ -135,7 +135,7 @@ class TestNotificationsDetailView(object):
 
         data = response.json()
         expected_keys = [
-            'id', 'currency', 'rate', 'threshold', 'token', 'is_active'
+            'id', 'currency', 'rate', 'threshold', 'is_active'
         ]
 
         assert response.status_code == status.HTTP_200_OK

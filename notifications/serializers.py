@@ -6,7 +6,6 @@ from notifications.models import Notification
 class NotificationSerializer(serializers.Serializer):
 
     id = serializers.IntegerField(read_only=True)
-    token = serializers.ReadOnlyField(source='user.auth_token.key')
     currency = serializers.ReadOnlyField(source='currency.code')
     rate = serializers.DecimalField(
         required=True, decimal_places=2, max_digits=6)
