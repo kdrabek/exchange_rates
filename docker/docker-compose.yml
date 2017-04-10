@@ -1,12 +1,10 @@
 version: "2"
 services:
   db:
-    restart: always
     image: postgres:9.5
     container_name: exchange_rates_postgres
     hostname: db
   rabbit:
-    restart: always
     hostname: rabbit
     container_name: exchange_rates_rabbit
     image: rabbitmq:3.6-management
@@ -16,7 +14,6 @@ services:
       - "5672"
       - "15672"
   web:
-    restart: always
     build:
       context: ../
       dockerfile: ./docker/Dockerfile
@@ -36,7 +33,6 @@ services:
     build:
       context: ../
       dockerfile: ./docker/Dockerfile
-    restart: always
     container_name: exchange_rates_worker_rates
     command: ./docker/run_rates_worker.sh
     env_file:
@@ -52,7 +48,6 @@ services:
       dockerfile: ./docker/Dockerfile
     env_file:
       - ./local.env
-    restart: always
     container_name: exchange_rates_worker_notifiactions
     command: ./docker/run_notifications_worker.sh
     volumes:
@@ -66,7 +61,6 @@ services:
       dockerfile: ./docker/Dockerfile
     env_file:
       - ./local.env
-    restart: always
     container_name: exchange_rates_shell
     command: tail -f /dev/null
     volumes:
@@ -75,7 +69,6 @@ services:
       - db
       - rabbit
   nginx:
-    restart: always
     container_name: exchange_rates_nginx
     build: ./nginx/
     ports:
