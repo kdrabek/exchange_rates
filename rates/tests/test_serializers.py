@@ -1,10 +1,11 @@
+from datetime import date, datetime
 from decimal import Decimal
-from datetime import datetime, date
+
 import pytest
 
 from rates.models import Currency, Rate, Table
 from rates.serializers import (
-    CurrencySerializer, RatesSerializer, RateDetailsSerializer
+    CurrencySerializer, RateDetailsSerializer, RatesSerializer
 )
 from rates.utils import CODE_TO_COUNTRY
 
