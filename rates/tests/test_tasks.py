@@ -7,7 +7,7 @@ import pytest
 from rates.downloader.downloader import RatesDownloader, RatesSaver
 from rates.models import Table
 from rates.tasks import (
-    find_rates_to_fetch, download_rates, RatesFetchingCoordinator
+    RatesFetchingCoordinator, download_rates, find_rates_to_fetch
 )
 
 

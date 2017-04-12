@@ -1,7 +1,7 @@
 from decimal import Decimal
 
-from freezegun import freeze_time
 import pytest
+from freezegun import freeze_time
 
 from rates.models import Currency, Rate, Table
 from rates.utils import CODE_TO_COUNTRY

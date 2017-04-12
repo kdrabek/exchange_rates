@@ -1,14 +1,13 @@
-from datetime import date, timedelta, datetime
 import os
+from datetime import date, datetime, timedelta
 
 import freezegun
-import pytest
 import mock
+import pytest
 from vcr import use_cassette
 
-from rates.downloader.downloader import RatesSaver, RatesDownloader
-from rates.models import Table, Rate, Currency
-
+from rates.downloader.downloader import RatesDownloader, RatesSaver
+from rates.models import Currency, Rate, Table
 
 HERE = os.path.dirname(os.path.realpath(__file__))
 
