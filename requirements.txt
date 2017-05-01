@@ -1,4 +1,4 @@
-Django==1.9.8
+Django==1.10
 djangorestframework==3.5.4
 gunicorn==19.6.0
 celery==4.0.2
